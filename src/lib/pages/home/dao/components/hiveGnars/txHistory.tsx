@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text, Code, UnorderedList, ListItem, Button, Select, Divider } from "@chakra-ui/react";
 import * as dhive from "@hiveio/dhive";
 import CryptoJS from 'crypto-js'; // Import CryptoJS
+import { Avatar, Link } from "@chakra-ui/react";
+
 
 const dhiveClient = new dhive.Client([
   "https://api.hive.blog",
@@ -28,7 +30,7 @@ const WalletTransactions: React.FC<WalletTransactionsProps> = ({ wallet }) => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [batchSize, setBatchSize] = useState(20);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>("transfer");
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -88,7 +90,7 @@ const WalletTransactions: React.FC<WalletTransactionsProps> = ({ wallet }) => {
 
   const decryptedTransactions = transactions.map((entry, index) => {
     const encryptedMemo = entry[1].op[1]?.memo || ""; // Handle cases where memo is missing
-    console.log(encryptedMemo)
+
     let decryptedMemo = "";
 
 try {
@@ -107,6 +109,7 @@ try {
     return {
       ...entry,
       decryptedMemo,
+      
     };
   });
 
@@ -142,6 +145,16 @@ try {
             <div key={index} style={{ width: "100%", overflow: "hidden", marginBottom: "16px" }}>
               <Box border="1px solid #ccc" p="2">
                 <Text fontWeight="bold">Operation: {entry[1].op[0]}</Text>
+                
+          <Avatar
+            name="oi"
+            border="2px solid #d7a917"
+            borderRadius="100px"
+            src={`https://images.ecency.com/webp/u/${entry[1].op[1].from}/avatar/small`}
+            width="100px"
+            height="100px"
+          />
+      
                 <Code minWidth="100%" colorScheme="teal" p="2">
                   <UnorderedList listStyleType="none" ml="0">
                     {Object.entries(entry[1].op[1]).map(([key, value]) => (
