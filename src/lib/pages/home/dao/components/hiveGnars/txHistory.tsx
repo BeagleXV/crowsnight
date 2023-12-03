@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, Code, UnorderedList, ListItem, Button, Select, Divider } from "@chakra-ui/react";
 import * as dhive from "@hiveio/dhive";
+import CryptoJS from 'crypto-js'; // Import CryptoJS
 
 const dhiveClient = new dhive.Client([
   "https://api.hive.blog",
@@ -77,16 +78,44 @@ const WalletTransactions: React.FC<WalletTransactionsProps> = ({ wallet }) => {
     }
   }, [wallet, batchSize, selectedType]);
 
-  const filteredTransactions = selectedType
-    ? transactions.filter((entry) => entry[1].op[0] === selectedType)
-    : transactions;
-
   const transactionTypes = Array.from(
     new Set(transactions.map((entry) => entry[1].op[0]))
   );
 
+  console.log(transactions)
+
+  const secretKey = "tormento666";
+
+  const decryptedTransactions = transactions.map((entry, index) => {
+    const encryptedMemo = entry[1].op[1]?.memo || ""; // Handle cases where memo is missing
+    console.log(encryptedMemo)
+    let decryptedMemo = "";
+
+try {
+  if (encryptedMemo) {
+    const bytes = CryptoJS.AES.decrypt(encryptedMemo, secretKey);
+    console.log(bytes)
+    decryptedMemo = bytes.toString(CryptoJS.enc.Utf8);
+    
+    console.log("PUNHETA",decryptedMemo)
+  }
+} catch (error) {
+  console.error("Error decrypting memo:", error);
+  // Lidar com erro de descriptografia, se necessário
+}
+    console.log(decryptedMemo)
+    return {
+      ...entry,
+      decryptedMemo,
+    };
+  });
+
+  const filteredTransactions = selectedType
+    ? decryptedTransactions.filter((entry) => entry[1].op[0] === selectedType)
+    : decryptedTransactions;
+
   return (
-    <Box minWidth="100%">
+    <Box minWidth="100%" style={{ zoom: 0.6 }}>
       <Box border="1px solid #ccc" p="2">
         <center>
           <Text fontSize="24" fontWeight="bold">Transactions of {wallet}:</Text>
@@ -117,7 +146,7 @@ const WalletTransactions: React.FC<WalletTransactionsProps> = ({ wallet }) => {
                   <UnorderedList listStyleType="none" ml="0">
                     {Object.entries(entry[1].op[1]).map(([key, value]) => (
                       <ListItem key={key}>
-                        <Text as="span" fontWeight="bold">{key}:</Text> {JSON.stringify(value, null, 2)}
+                        <Text as="span" fontWeight="bold">{key}:</Text> {key === 'memo' ? entry.decryptedMemo : JSON.stringify(value, null, 2)}
                       </ListItem>
                     ))}
                   </UnorderedList>
@@ -127,9 +156,9 @@ const WalletTransactions: React.FC<WalletTransactionsProps> = ({ wallet }) => {
           ))}
           {transactions.length < batchSize * 2 && (
             <center>
-            <Button mt="4" colorScheme="teal" onClick={loadMoreTransactions}>
-              Load More
-            </Button>
+              <Button mt="4" colorScheme="teal" onClick={loadMoreTransactions}>
+                Load More
+              </Button>
             </center>
           )}
         </Box>
