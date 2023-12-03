@@ -73,7 +73,7 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
     state: "",
   });
   const secretKey = 'tormento666';
-  const initialAmount = "13.000";
+  const initialAmount = "0.001";
 
   useEffect(() => {
     console.log("HiveMEMO:", hiveMemo);
