@@ -19,6 +19,7 @@ import {
 import { KeychainSDK } from "keychain-sdk";
 import { Card } from "@chakra-ui/react";
 
+
 interface Card {
   imageUrl: string;
   subtitle: string;
@@ -72,6 +73,27 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
     city: "",
     state: "",
   });
+  
+  const [confirmedAddress, setConfirmedAddress] = useState<{
+    street: string;
+    city: string;
+    state: string;
+  } | null>(null);
+
+  const [isAddressConfirmed, setIsAddressConfirmed] = useState(false);
+
+  const confirmAddress = () => {
+    setConfirmedAddress(address);
+    setIsAddressConfirmed(true);
+  };
+
+  const resetAddressConfirmation = () => {
+    setConfirmedAddress(null);
+    setIsAddressConfirmed(false);
+  };
+
+
+
   const secretKey = 'tormento666';
   const initialAmount = "13.000";
 
@@ -202,6 +224,29 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
              color={"white"}
              maxLength={8}
             />
+            {/* Campo para exibir o endereço confirmado */}
+          {confirmedAddress && (
+            <Input
+              placeholder="Endereço Confirmado"
+              value={`${confirmedAddress.street}, ${confirmedAddress.city}, ${confirmedAddress.state}`}
+              isReadOnly
+              color={"white"}
+              marginBottom="1rem"
+            />
+          )}
+
+          {/* Botão para confirmar o endereço */}
+          {!confirmedAddress && (
+            <Button colorScheme="purple" color={"#b4d701"} onClick={confirmAddress}>
+              Confirmar Endereço
+            </Button>
+          )}
+          {/* Botão para redefinir a confirmação do endereço */}
+          {isAddressConfirmed && (
+            <Button colorScheme="purple" color={"#b4d701"} onClick={resetAddressConfirmation}>
+              Redefinir Endereço
+            </Button>
+          )}
             <Input
             placeholder="Complemento"
             value={complemento}
@@ -229,10 +274,10 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
           </Box>
         </ModalBody>
         <ModalFooter margin={"auto"}>
-          <Button colorScheme="purple" mr={3} onClick={handleTransfer}>
+          <Button colorScheme="purple" color={"#b4d701"} mr={3} onClick={handleTransfer}>
             Comprar
           </Button>
-          <Button colorScheme="purple" onClick={() => setShowModal(false)}>
+          <Button colorScheme="purple" color={"#b4d701"} onClick={() => setShowModal(false)}>
             Fechar
           </Button>
         </ModalFooter>
