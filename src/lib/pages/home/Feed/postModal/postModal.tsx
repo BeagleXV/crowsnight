@@ -11,6 +11,7 @@ import {
   Button,
   Textarea,
   HStack,
+  Flex,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
@@ -51,7 +52,8 @@ const PostModal: React.FC<Types.PostModalProps> = ({
   permlink,
   weight,
   comments = [],
-  postUrl
+  postUrl,
+  userVote
 }) => {
   
   const avatarUrl = `https://images.ecency.com/webp/u/${author}/avatar/small`;
@@ -63,13 +65,7 @@ const PostModal: React.FC<Types.PostModalProps> = ({
   const [editedContent, setEditedContent] = useState(content);
   const [client, setClient] = useState(new Client(nodes[0]));
   const [nodeIndex, setNodeIndex] = useState(0);
-  console.log(postUrl)
   const [showLoginModal, setShowLoginModal] = useState(false); // State to control the login modal visibility
-
-
-
-
-
 
   function transformYouTubeContent(content: string): string {
     // Regular expression to match YouTube video URLs
@@ -199,9 +195,6 @@ const PostModal: React.FC<Types.PostModalProps> = ({
   
   
 
- 
-
-
 //  ---------------------------------------Voting Button -------------------------------
 
   const [sliderValue, setSliderValue] = useState(0);
@@ -252,7 +245,7 @@ const handleViewFullPost = (event:any) => {
   console.log("Post data before navigation:", postData);
 
 };
-const cleanUrl = 'post' + postData.postUrl;
+const cleanUrl = generatePostUrl().replace(window.location.origin, '');
 
 const postLink = window.location.protocol + '//' + postUrl;
 
@@ -276,16 +269,18 @@ const transformedContent = transformYouTubeContent(content);
 
 return (
   <Modal isOpen={isOpen} onClose={onClose} size="3xl">
-    <ModalOverlay />
+  <ModalOverlay />
     <ModalContent background = {'black'} border={'3px solid #5E317A'}>
       <ModalHeader>
         <PostHeader title={title} author={author} avatarUrl={avatarUrl} postUrl={postUrl} permlink={permlink} onClose={onClose} />
-        {isUserLoggedIn && user.name === author && !isEditing && (
-          <Button id="editButton" onClick={handleEditClick}>Edit</Button>
-        )}
-        {isUserLoggedIn && isEditing && (
-          <Button id="saveButton" onClick={handleSaveClick}>Save</Button>
-        )}
+        <Flex justifyContent={'flex-end'} marginTop={3}>
+          {isUserLoggedIn && user.name === author && !isEditing && (
+            <Button id="editButton" onClick={handleEditClick}>Edit</Button>
+          )}
+          {isUserLoggedIn && isEditing && (
+            <Button id="saveButton" onClick={handleSaveClick}>Save</Button>
+          )}
+        </Flex>
       </ModalHeader>
       
       <ModalBody ref={modalContainerRef}>
@@ -293,6 +288,7 @@ return (
           <Textarea
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
+            height={500}
           />
         ) : (
           
@@ -307,7 +303,7 @@ return (
         )}
         
       </ModalBody>
-      <Comments comments={comments} commentPosted={commentPosted} blockedUser={"hivebuzz"} permlink=''/>
+      <Comments comments={comments} commentPosted={commentPosted} blockedUser={"hivebuzz"} permlink='' />
       <HStack justifyContent="space-between">
         <Link to={{ pathname: cleanUrl, state: { post: postData } } as any}>
           <Button color="#b4d701" bg="black" margin="15px" border="1px solid #5E317A" onClick={handleViewFullPost}>Ver o post completo</Button>
@@ -325,7 +321,7 @@ return (
         parentPermlink={permlink}
         onCommentPosted={() => setCommentPosted(!commentPosted)}
       />
-          <PostFooter onClose={onClose} user={user} author={author} permlink={permlink} weight={weight} />
+          <PostFooter onClose={onClose} user={user} author={author} permlink={permlink} weight={weight} userVote={userVote}  />
 
         </div>
       ) : (
@@ -336,7 +332,7 @@ return (
       )}
 
 
-    </ModalContent>
+    </ModalContent>   
 
 
     <HiveLogin isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />

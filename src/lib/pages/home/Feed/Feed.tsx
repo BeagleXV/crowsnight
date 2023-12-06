@@ -17,14 +17,13 @@ import {
   useDisclosure,
   Tooltip,
 } from "@chakra-ui/react";
-
 import { Client } from "@hiveio/dhive";
 import voteOnContent from "../api/voting";
 import useAuthUser from "../api/useAuthUser";
 
 import { useEffect, useState } from "react";
 import PostModal from "./postModal/postModal";
-
+import ErrorModal from "./postModal/errorModal";
 import { useNavigate, Link } from "react-router-dom";
 
 import * as Types from "./types";
@@ -34,7 +33,12 @@ import EarningsModal from "./postModal/earningsModal"; // Replace with the corre
 import { MdArrowUpward } from 'react-icons/md';
 import axios from "axios";
 import { AxiosResponse } from 'axios';
-
+import { Style } from "util";
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  errorMessage: string;
+}
 
 const nodes = [
   "https://rpc.ecency.com",
@@ -58,12 +62,12 @@ const randomSentences = [
   "Foda-se o instagram!",
   "Skateboard, porra!!!",
 ];
+const SPECIAL_TAG = "crowsnight666";
+
 
 const PlaceholderLoadingBar = () => {
   const randomIndex = Math.floor(Math.random() * randomSentences.length);
-  const randomSentence = randomSentences[randomIndex]; 
-
-  
+  const randomSentence = randomSentences[randomIndex];
 
   return (
     <center onLoad={() => {}}>
@@ -91,10 +95,14 @@ const HiveBlog: React.FC<Types.HiveBlogProps> = ({
     null
   );
   const [postUrl, setPostUrl] = useState<string | null>(null);
-  const [displayedPosts, setDisplayedPosts] = useState<number>(15 );
-  const [postsToLoadInitially] = useState<number>(15); // Number of posts to load initially
+  const [displayedPosts, setDisplayedPosts] = useState<number>(20 );
+  const [postsToLoadInitially] = useState<number>(20); // Number of posts to load initially
   const [postsToLoadMore] = useState<number>(10); // Number of additional posts to load on "Load More" click
   const { user, isLoggedIn } = useAuthUser();
+  const [hasVotedWitness, setHasVotedWitness] = useState<boolean>(false); // Step 4
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Track modal visibility
+  const [errorMessage, setErrorMessage] = useState<string>(""); // Track error message
+
   const fetchPostEarnings = async (
     author: string,
     permlink: string
@@ -108,7 +116,6 @@ const HiveBlog: React.FC<Types.HiveBlogProps> = ({
       const pendingPayout = parseFloat(
         post.pending_payout_value.split(" ")[0]
       );
-      
       const totalEarnings = totalPayout + curatorPayout + pendingPayout;
       return totalEarnings;
     } catch (error) {
@@ -116,12 +123,12 @@ const HiveBlog: React.FC<Types.HiveBlogProps> = ({
       const newIndex = (nodeIndex + 1) % nodes.length;
       setNodeIndex(newIndex);
       setClient(new Client(nodes[newIndex]));
-      console.log(`Switched to node: ${nodes[newIndex]}`);
       // Retry the request with the new node
       return fetchPostEarnings(author, permlink);
     }
   };
 
+  
   const { isOpen, onOpen, onClose } = useDisclosure();
 
 // Endpoint da API CoinGecko para obter a taxa de câmbio USD para BRL
@@ -205,56 +212,56 @@ const [brl, setBrl] = useState(0);
     setIsLoadingMore(false); // Clear loading state after new posts are loaded
   };
 
+  const fetchInitialPosts = async () => {
+    setIsLoadingInitial(true); // Set loading state for initial posts
+
+    try {
+      const query = {
+        tag: currentTag,
+        limit: postsToLoadInitially, // Load initial posts
+      };
+      const result = await client.database.getDiscussions(queryType, query);
+
+      const postsWithThumbnails = result.map((post) => {
+        const metadata = JSON.parse(post.json_metadata);
+        const thumbnail =
+          Array.isArray(metadata?.image) && metadata.image.length > 0
+            ? metadata.image[0]
+            : defaultThumbnail;
+        return { ...post, thumbnail, earnings: 0 }; // Initialize earnings to 0
+      });
+
+      // Fetch earnings for each initial post concurrently
+      const earningsPromises = postsWithThumbnails.map((post) =>
+        fetchPostEarnings(post.author, post.permlink).catch((error) => {
+          console.log(error);
+          return placeholderEarnings; // Use placeholder value if fetching actual earnings fails
+        })
+      );
+      const earnings = await Promise.all(earningsPromises);
+
+      // Update earnings for each initial post
+      const updatedPostsWithEarnings = postsWithThumbnails.map(
+        (post, index) => ({ ...post, earnings: earnings[index] })
+      );
+
+      // Set the initial loaded posts
+      setLoadedPosts(updatedPostsWithEarnings);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setIsLoadingInitial(false); // Clear loading state for initial posts
+  };
+
   useEffect(() => {
-    const fetchInitialPosts = async () => {
-      setIsLoadingInitial(true); // Set loading state for initial posts
-
-      try {
-        const query = {
-          tag: currentTag,
-          limit: postsToLoadInitially, // Load initial posts
-        };
-        const result = await client.database.getDiscussions(queryType, query);
-
-        const postsWithThumbnails = result.map((post) => {
-          const metadata = JSON.parse(post.json_metadata);
-          const thumbnail =
-            Array.isArray(metadata?.image) && metadata.image.length > 0
-              ? metadata.image[0]
-              : defaultThumbnail;
-          return { ...post, thumbnail, earnings: 0 }; // Initialize earnings to 0
-        });
-
-        // Fetch earnings for each initial post concurrently
-        const earningsPromises = postsWithThumbnails.map((post) =>
-          fetchPostEarnings(post.author, post.permlink).catch((error) => {
-            console.log(error);
-            return placeholderEarnings; // Use placeholder value if fetching actual earnings fails
-          })
-        );
-        const earnings = await Promise.all(earningsPromises);
-
-        // Update earnings for each initial post
-        const updatedPostsWithEarnings = postsWithThumbnails.map(
-          (post, index) => ({ ...post, earnings: earnings[index] })
-        );
-
-        // Set the initial loaded posts
-        setLoadedPosts(updatedPostsWithEarnings);
-      } catch (error) {
-        console.log(error);
-      }
-
-      setIsLoadingInitial(false); // Clear loading state for initial posts
-    };
-
     fetchInitialPosts(); // Fetch initial posts when the component mounts
   }, [tag]);
 
   const loadMorePosts = () => {
     fetchPosts(); // Fetch more posts when "Load More" is clicked
   };
-  useEffect(() => {
+useEffect(() => {
     const audio = new Audio("/assets/audio/crowaudio.mp3");
   
     const playAudio = () => {
@@ -280,17 +287,55 @@ const [brl, setBrl] = useState(0);
 
   const fetchComments = async (author: string, permlink: string): Promise<any[]> => {
     try {
-      const comments = await client.database.call("get_content_replies", [
-        author,
-        permlink,
-      ]);
-      return comments;
+      let comments = await client.call("bridge", "get_discussion",
+        { 
+          author,
+          permlink,
+          observer: user?.name || "",
+        }
+      );
+
+      // delete the original post from the comments object
+      // its key is @username/permlink
+      const originalPostKey = `${author}/${permlink}`;
+      delete comments[originalPostKey];
+
+      // loop through the comments and add the sub replies to comments in its repliesFetched property
+      for (const commentKey in comments) {
+        const comment = comments[commentKey];
+        const subComments = comment.replies;
+
+        // add a repliesFetched property to the comment
+        comments[commentKey].repliesFetched = [];
+
+        // add the sub comments to the repliesFetched property of this comment
+        for (let i = 0; i < subComments.length; i++) {
+          const subComment = subComments[i];
+          comments[commentKey].repliesFetched.push(comments[subComment]);
+        }
+
+        // set net_votes of the comment with active_votes.length
+        comments[commentKey].net_votes = comments[commentKey].active_votes.length;
+      }
+
+      const commentsArray = [];
+
+      // add the comments to the commentsArray
+      for (const commentKey in comments) {
+        const comment = comments[commentKey];
+        
+        // push the comment to the comments array only if its a reply to the original post
+        if (comment.parent_author === author && comment.parent_permlink === permlink) {
+          commentsArray.push(comments[commentKey]);
+        }
+      }
+
+      return commentsArray;
     } catch (error) {
       // If a request fails, switch to the next node
       const newIndex = (nodeIndex + 1) % nodes.length;
       setNodeIndex(newIndex);
       setClient(new Client(nodes[newIndex]));
-      console.log(`Switched to node: ${nodes[newIndex]}`);
       // Retry the request with the new node
       return fetchComments(author, permlink);
     }
@@ -351,7 +396,7 @@ const cardStyles = css`
   }
 `;
 
-const truncateTitle = (title:any, maxCharacters = 61) => {
+const truncateTitle = (title:any, maxCharacters = 60) => {
   // full caps for title of post
   title = title.toUpperCase();
 
@@ -367,6 +412,8 @@ const handleVoteClick = async (post: any) => {
   if (!isLoggedIn()) {
     // Handle the case where the user is not logged in, e.g., show a login prompt
     console.log("User is not logged in. Show a login prompt.");
+    setErrorMessage("You have to login first ! Dãããã... ")
+    setIsErrorModalOpen(true)
     return;
   }
 
@@ -374,18 +421,110 @@ const handleVoteClick = async (post: any) => {
   try {
     // You may need to retrieve the user's username and other information here
     const username = user?.name || ""; // Replace with the actual username
-    const weight = 10000; // Replace with the desired voting weight
+    let weight = 10000; // Replace with the desired voting weight
+
+    if (isVoted(post)) {
+      weight = 0; // If the post has been voted on, set the weight to 0 to remove the vote
+    }
 
     // Call the voteOnContent function to vote on the post
     await voteOnContent(username, post.permlink, post.author, weight);
 
     // Handle successful vote
     console.log("Vote successful!");
+
+    // set loading and then rerender the component
+    setIsLoadingInitial(true);
+    setLoadedPosts([]);
+    setDisplayedPosts(20);
+    setTimeout(() => {
+      fetchInitialPosts();
+    }, 3000);
   } catch (error) {
     // Handle voting error
     console.error("Error while voting:", error);
+    setErrorMessage("Error While Voting!")
+
+    setIsErrorModalOpen(true); // Open the error modal
   }
 };
+const cardStyleGradient = css`
+background-color: "linear-gradient(to top, #0D0D0D, #1C1C1C, #000000)",
+`;
+
+const isVoted = (post: any) => {
+  // check for user in active_votes
+  const userVote = post.active_votes.find((vote: any) => vote.voter === user?.name);
+  const percentage = parseInt(userVote?.percent);
+
+  if (userVote && (percentage > 0 || percentage < 0)) {
+    return true;
+  }
+
+  return false;
+}
+
+const getUserVote = (post: any) => {
+  // check for user in active_votes
+  const userVote = post.active_votes.find((vote: any) => vote.voter === user?.name);
+  const percentage = parseInt(userVote?.percent);
+
+  if (userVote && (percentage > 0 || percentage < 0)) {
+    const vote = {
+      isVoted: true,
+      rshares: userVote.rshares,
+      percent: percentage,
+    };
+
+    console.log(vote, post.permlink)
+
+    return vote;
+  }
+
+  return {
+    isVoted: false,
+    rshares: 0,
+    percent: 0,
+  };
+}
+
+const getVotedProperties = (post: any) => {
+  // If the post has been voted on, return the voted properties
+  if (isVoted(post)) {
+    return {
+      width: '10px',
+      backgroundColor: 'red', // Change the background color
+      color: 'black', // Change the text color
+    };
+  }
+
+  // If the post has not been voted on, return an empty object
+  return {
+    width: '10px'
+  };
+}
+
+const getVotedHoverProperties = (post: any) => {
+  // If the post has been voted on, return the voted properties
+  if (isVoted(post)) {
+    // red hover
+    return {
+      backgroundColor: 'mediumvioletred', // Change the color on hover
+      color: 'mediumspringgreen', // Change the text color on hover
+      boxShadow: '0 0 8px red, 0 0 8px red, 0 0 8px red', // Add an underglow effect
+      border: "2px solid red"
+    };
+  }
+
+  // If the post has not been voted on, return normal hover properties
+  return {
+    backgroundColor: 'mediumspringgreen', // Change the color on hover
+    color: 'mediumvioletred', // Change the text color on hover
+    boxShadow: '0 0 8px darkgoldenrod, 0 0 8px darkgoldenrod, 0 0 8px darkgoldenrod', // Add an underglow effect
+    border: "2px solid darkgreen" 
+  };
+}
+
 
 return (
   <Box>
@@ -393,6 +532,11 @@ return (
       <PlaceholderLoadingBar />
     ) : (
       <>
+        <ErrorModal
+          isOpen={isErrorModalOpen}
+          onClose={() => setIsErrorModalOpen(false)}
+          errorMessage={errorMessage}
+        />
         <Box
           display="grid"
           gridTemplateColumns={`repeat(${gridColumns}, minmax(280px, 1fr))`}
@@ -409,30 +553,39 @@ return (
               onClick={() => handleCardClick(post)}
               cursor="pointer"
               css={cardStyles} /* Apply the cardStyles CSS */
+              style={{
+                backgroundImage: ``, // Replace 'your-image-url.jpg' with your image URL
+                backgroundSize: '100% auto',
+                backgroundPosition: 'center top',
+                backgroundRepeat: 'no-repeat',
+                
+                
+              }}
             >
 
 
               <CardHeader>
-                <Flex>
-                  <Flex
-                    css={cardStyles} /* Apply the cardStyles CSS */
-                    flex="1"
+<Flex>
+                <Flex
+                  css={cardStyles} /* Apply the cardStyles CSS */
+flex="1"
                     gap="3"
-                    borderRadius="10px"
-                    alignItems="center"
-                  >
+                  borderRadius="10px"
+                  justifyContent="center" /* Center the content horizontally */
+                  alignItems="center"
+                >
                     <Box>
-                      <Heading color="#b4d701" size="lg">
-                        {post.author}
-                      </Heading>
-                    </Box>
+                  <Heading color="#b4d701" size="lg">
+                    {post.author}
+                  </Heading>
+</Box>
                   </Flex>
 
                 </Flex>
               </CardHeader>
 
-              
-              <Box padding="10px" height="200px"> 
+                            
+              <Box padding="20px" height="200px"> 
                 <Image 
                   objectFit="cover"
                   border="3px solid #d7a917"
@@ -452,15 +605,15 @@ return (
                   minHeight="100%"
 
                   style={{ //style of the speech bubble
-                    backgroundImage: `url('')`,
-                    backgroundSize: '105% 140%', // stretches the speech bubble as big as the div and dynamically changes 
+                    backgroundImage: ``,
+                    backgroundSize: '100% 100%', // stretches the speech bubble as big as the div and dynamically changes 
                     backgroundPosition: 'center', 
                     backgroundRepeat: 'no-repeat', 
                     marginBottom: '-40px', // makes the speech bubble extend beyond the div
-                    paddingBottom: '60px', // for some reason it needs this part too?
+                    paddingBottom: '40px', // for some reason it needs this part too?
                   }}
                 >
-                  <Text  
+                  <Text 
                         color="white" 
                         paddingLeft="5px"
                         paddingTop="10px"
@@ -475,42 +628,68 @@ return (
               </Box>
           </CardBody>
 
-              <CardFooter>
+              <CardFooter
+                
+              style={{
+                
+                backgroundImage:
+                    post.earnings > 30
+                    ? `url('https://images.hive.blog/0x0/https://files.peakd.com/file/peakd-hive/web-gnar/EocCPiTarW3qvJ2tp67PbkHCwcpac51SkMpTqDg6HjTQZYDncJvxkikLToUUBEHWG8A.gif')`
+                    : post.earnings >= 10 && post.earnings <= 20
+                    ? `url('https://images.hive.blog/0x0/https://files.peakd.com/file/peakd-hive/web-gnar/EnymbnXgVUtxPZPsL3n1nQRYkhnv1VBGfV3ABoPLqN5VKgdjhV9wiH9hBtz8e1iVTXF.gif')`
+                    : post.earnings >= 20 && post.earnings <= 30
+                    ? `url('https://images.hive.blog/0x0/https://files.peakd.com/file/peakd-hive/web-gnar/23u5bNzQ1Witg6qMPYBbgxzPzAx8iR8TDYWA5goRhanYgcqTGofXvPd9vMdDVogKoSwTb.gif')`
+                    : 'none',
+                    backgroundSize: '100% auto',
+                    backgroundPosition: 'center bottom',
+                    backgroundRepeat: 'no-repeat',
+                    overflow: 'hidden',
+                    borderRadius: '10px',
+                    
+                
+              }}
+
+              
+            >
+              
+              
                 <Text
                   color="white"
                   marginTop = "2px"
                   style={{ display: "flex", alignItems: "center" }} >
 
                 <Link to={`profile/${post.author}`}>
-                      <Avatar
-                        name={post.author}
+                      <Image
                         border="2px solid #d7a917"
-                        borderRadius="100px"
+                        borderRadius="10px"
                         src={`https://images.ecency.com/webp/u/${post.author}/avatar/small`}
                         width="105%"
                         height="105%"
+                        style={{
+                          boxShadow: '0 8px 12px rgba(0, 0, 0, 0.8)', // Adding a drop shadow
+                        }}
                       />
                     </Link>
 
                     
-
-                    <Tooltip color={"white"} backgroundColor={"black"} border={"1px dashed white"} label={<div style={{color: 'white'}}>45% - 🛹 Usuários e Beneficiários <br /> 50% - 🧡 Para quem vota <br /> 5%  - 🏦 Tesouro <br /><br /> Clique para saber mais  </div>} aria-label="View Voters">
-                  <Button
-                    position="absolute"
-                    bottom="10px"
-                    right="10px"
-                    onClick={(e) => {e.stopPropagation(); handleVotersModalOpen(post);}}
-                    variant="ghost"
-                    colorScheme="red"
-                    size="s"
-                    ml={2}
-                    style={{
-                      fontFamily: 'Creepster, sans-serif',
-                      fontSize: `28px`,
-            
-                    }}
-                    _hover={{
-                      backgroundColor: 'transparent', // Cor de fundo ao passar o mouse
+                
+                <Tooltip color={"white"} backgroundColor={"black"} border={"1px dashed limegreen"} label={<div style={{color: 'white'}}>45% - 🛹 Author + Benef. <br /> 50% - 🧡 Voters <br /> 5%  - 🏦 Treasury* <br /><br /> Click to Learn More  </div>} aria-label="View Voters">
+                <Button
+                      position="absolute"
+                      bottom="10px"
+                      right="10px"
+                      onClick={(e) => {e.stopPropagation(); handleVotersModalOpen(post);}}
+                      variant="ghost"
+                      colorScheme="red"
+                      size="s"
+                      ml={2}
+                      style={{
+                          fontFamily: 'Creepster, sans-serif',
+                          fontSize: `28px`,
+                          
+                      }}
+                      _hover={{
+                          backgroundColor: 'transparent', // Cor de fundo ao passar o mouse
                   }} //dynamically changes font size based on numerical value of post.earnings
                   >
                    <Text marginBottom={"45px"} color={"#FA2622"} > R$ {(post.earnings*brl).toFixed(2)}</Text>
@@ -518,8 +697,8 @@ return (
                       src="../../../../assets/blood4.gif"
                       alt="spinning stoken coin"
                       style={{
-                        width: "30px",
-                        height: "70px",
+                        width: "30px", 
+                        height: "70px", 
                         marginLeft: "10px",
                         marginRight: "12px",
                         marginBottom: "-10px",
@@ -527,25 +706,39 @@ return (
                     />
                   </Button>
                 </Tooltip>
-                </Text>
-                
-                <Box marginLeft="auto">
-                <IconButton
-              icon={<MdArrowUpward />}
-              marginBottom= "-5"
-              backgroundColor="black"
-              color="red"
-              variant="ghost"
-              size="xs"
-              borderRadius="50%"
-              aria-label="Upvote"
-              border="1px"
-              borderColor="red"
-              onClick={() => handleVoteClick(post)}
-            />
-                 </Box>
-                 
 
+                </Text>
+
+                <Box marginLeft="auto">
+                <Tooltip backgroundColor={"black"} border={"1px dashed limegreen"} label={<div style={{color: '#b4d701'}}>Voce é trevoso!</div>} aria-label="View Voters">
+
+                <IconButton
+                    icon={<MdArrowUpward />}
+                    backgroundColor="black"
+                    color="red"
+              variant="ghost"
+                    size="xs"
+                    borderRadius="50%"
+                    aria-label="Upvote"
+                    border="1px"
+                    borderColor="red"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the click event from propagating
+                      handleVoteClick(post);
+                  
+                    }}
+
+                    style={getVotedProperties(post)} // Apply the voted properties
+
+
+                    _hover={getVotedHoverProperties(post)} // Apply the hover properties
+                    
+                  />
+
+                                  </Tooltip>
+
+                </Box>
+                
 
 
               </CardFooter>
@@ -574,6 +767,7 @@ return (
           isOpen={isOpen}
           comments={comments}
           postUrl={selectedPost?.url}
+          userVote={selectedPost ? getUserVote(selectedPost) : null}
         />
       </ModalContent>
     </Modal>
