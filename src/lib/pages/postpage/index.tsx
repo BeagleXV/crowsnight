@@ -28,12 +28,9 @@ import VotingBox from './votingBox';
 import { transformYouTubeContent } from '../utils/videoUtils/VideoUtils';
 import { transform3SpeakContent } from '../utils/videoUtils/transform3speak';
 import { transformGiphyLinksToMarkdown } from '../utils/ImageUtils';
-import { color } from 'framer-motion';
+import useAuthUser from '../home/api/useAuthUser';
 
-
-type User = {
-  name: string;
-} | null;
+import Comments from '../home/Feed/postModal/comments';
 
 
 const PostPage: React.FC = () => {
@@ -47,9 +44,9 @@ const PostPage: React.FC = () => {
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [commentsUpdated, setCommentsUpdated] = useState(false);
   const [commentContent, setCommentContent] = useState('');
-  const [username, setUsername] = useState<string | null>(null);
   const [sliderValue, setSliderValue] = useState(0);
-
+  const [username, setUsername] = useState<string | null>(null);
+  const user = useAuthUser();
   useEffect(() => {
     const client = new Client('https://api.hive.blog');
 
@@ -70,8 +67,53 @@ const PostPage: React.FC = () => {
 
     const fetchComments = async () => {
       try {
-        const commentsData: CommentProps[] = await client.database.call("get_content_replies", [URLAuthor, URLPermlink]);
-        setComments(commentsData);
+        const author = URLAuthor;
+        const permlink = URLPermlink;
+        
+        let comments = await client.call("bridge", "get_discussion",
+          { 
+            author,
+            permlink,
+            observer: user?.user?.name || "",
+          }
+        );
+
+        // delete the original post from the comments object
+        // its key is @username/permlink
+        const originalPostKey = `${author}/${permlink}`;
+        delete comments[originalPostKey];
+
+        // loop through the comments and add the sub replies to comments in its repliesFetched property
+        for (const commentKey in comments) {
+          const comment = comments[commentKey];
+          const subComments = comment.replies;
+
+          // add a repliesFetched property to the comment
+          comments[commentKey].repliesFetched = [];
+
+          // add the sub comments to the repliesFetched property of this comment
+          for (let i = 0; i < subComments.length; i++) {
+            const subComment = subComments[i];
+            comments[commentKey].repliesFetched.push(comments[subComment]);
+          }
+
+          // set net_votes of the comment with active_votes.length
+          comments[commentKey].net_votes = comments[commentKey].active_votes.length;
+        }
+
+        const commentsArray = [];
+
+        // add the comments to the commentsArray
+        for (const commentKey in comments) {
+          const comment = comments[commentKey];
+          
+          // push the comment to the comments array only if its a reply to the original post
+          if (comment.parent_author === author && comment.parent_permlink === permlink) {
+            commentsArray.push(comments[commentKey]);
+          }
+        }
+
+        setComments(commentsArray);
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
@@ -81,8 +123,36 @@ const PostPage: React.FC = () => {
     fetchComments();
   }, [URLAuthor, URLPermlink, commentsUpdated]);
 
+  const getUserVote = (post: any) => {
+    // check for user in active_votes
+    const userVote = post.active_votes.find((vote: any) => vote.voter === username);
+    const percentage = parseInt(userVote?.percent);
+  
+    if (userVote && (percentage > 0 || percentage < 0)) {
+      const vote = {
+        isVoted: true,
+        rshares: userVote.rshares,
+        percent: percentage,
+      };
+  
+      console.log(vote, post.permlink)
+  
+      return vote;
+    }
+  
+    return {
+      isVoted: false,
+      rshares: 0,
+      percent: 0,
+    };
+  }
 
-
+  useEffect(() => {
+    if (user && user.user?.name) {
+      setUsername(user.user.name);
+    }
+  }
+  , [user]);
 
 
   const commentTitleStyle = {
@@ -133,7 +203,7 @@ const PostPage: React.FC = () => {
 
   const [isDesktop] = useMediaQuery("(min-width: 768px)");
 
-  useEffect(() => {
+useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       const userObject = JSON.parse(storedUser);
@@ -177,8 +247,6 @@ const PostPage: React.FC = () => {
     padding: '20px',
     borderRadius: '10px',
   };
-  const userFromSession = sessionStorage.getItem("user");
-  const user: User = userFromSession ? JSON.parse(userFromSession) : null;
 
   return (
     <div style={containerStyle}>
@@ -211,10 +279,11 @@ const PostPage: React.FC = () => {
         >
           <VotingBox
             onClose={() => {}}
-            user={user}
+            user={username}
             author={URLAuthor}
             permlink={URLPermlink}
             weight={sliderValue}
+            userVote={post ? getUserVote(post) : { isVoted: false, rshares: 0, percent: 0 }}
           />
           <center>
             <h1 style={commentTitleStyle}>Comente algo sobre o post...</h1>
@@ -234,7 +303,7 @@ const PostPage: React.FC = () => {
             <center>
               <h1 style={commentTitleStyle}>Comentários</h1>
             </center>
-            {comments.map((comment, index) => (
+            {/* comments.map((comment, index) => (
               <div key={index}>
                 <Box
                   style={{
@@ -250,7 +319,7 @@ const PostPage: React.FC = () => {
                       borderRadius="50%"
                       marginRight="8px"
                     />
-                    <h1 style={{ color: '#D9D5A0' }}>{comment.author} </h1>
+                    <h1>{comment.author}</h1>
                   </Flex>
                   <ReactMarkdown
                     children={comment.body}
@@ -260,7 +329,20 @@ const PostPage: React.FC = () => {
                   />
                 </Box>
               </div>
-            ))}
+            )) */}
+            {comments && comments.length > 0 ? (
+              <Comments
+                comments={comments}
+                commentPosted={false}
+                blockedUser={'hivebuzz'}
+                permlink={URLPermlink}
+              />
+            ) : (
+              <center>
+                <h1>No comments yet</h1>
+              </center>
+            )}
+            
           </Flex>
         </VStack>
       </Flex>
