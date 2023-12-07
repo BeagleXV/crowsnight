@@ -1,14 +1,24 @@
-import React from 'react';
-import { Button, Flex, Slider, SliderTrack, SliderFilledTrack, Box, Text } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Button, Flex, Slider, SliderTrack, SliderFilledTrack, SliderThumb, Box, Text } from '@chakra-ui/react';
 import voteOnContent from '../home/api/voting';
-import { useState } from 'react';
+import useAuthUser from '../home/api/useAuthUser';
+import ErrorModal from '../home/Feed/postModal/errorModal';
 
+import * as Types from '../home/Feed/types';
+import { color } from 'framer-motion';
 
-import * as Types from '../home/Feed/types'
+const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, author, permlink, weight = 10000, userVote }) => {
+  const user = useAuthUser();
+  
+  const [sliderValue, setSliderValue] = useState(5000);
 
-const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, user, author, permlink, weight = 10000 }) => {
-  const [sliderValue, setSliderValue] = useState(0);
+  const [feedbackText, setFeedbackText] = useState(''); // Track feedback text
+  const [voteMessage, setVoteMessage] = useState('Vote'); // Track vote button text
+
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Track modal visibility
+
   const getFeedbackText = (value: number) => {
+    
     if (value === -10000) return "Seu fraco!";
     if (value === -5000) return "Não gostei muito.";
     if (value === 0) return "Tenta outra vez!";
@@ -16,27 +26,30 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, user, author, per
     if (value === 10000) return "Você é trevoso!";
     return "";
   };
-  
 
   const handleVote = async () => {
-    
-    if (!user || !user.name) {
+    if (!user || !user.user?.name) {
       console.error("User not logged in or missing username");
       return;
     }
-  
+
     try {
-      await voteOnContent(user.name, permlink, author, sliderValue);
+      await voteOnContent(user.user.name, permlink, author, sliderValue);
       console.log("Voting successful!");
       // handle the vote result here
+      userVote.isVoted = true;
+      userVote.percent = sliderValue;
+
+      setVoteMessage('Already Voted');
+      const feedback = getFeedbackText(sliderValue);
+      setFeedbackText(feedback);
     } catch (error) {
       console.error("Voting failed:", error);
+      setIsErrorModalOpen(true);
       // handle the error properly here
     }
   };
-  
-  
-   
+
   const emojiByAmount: { [key: string]: string } = {
     "-10000": "💩",
     "-5000": "💀",
@@ -44,20 +57,48 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, user, author, per
     "5000": "🙂",
     "10000": "🛹",
   };
-  
-  const skateEmojiStyle = {
+
+  const skateEmojiStyle: React.CSSProperties = {
     fontSize: '2em',
     position: 'absolute',
     top: '50%',
     left: `${(sliderValue + 10000) / 20000 * 100}%`,
     transform: 'translate(-50%, -50%)',
     cursor: 'grab',
-  } as React.CSSProperties; // Type assertion
-  
+  };
+
+  useEffect(() => {
+    // if the current vote is equal to slider, vote message is Already Voted
+    if (userVote.isVoted && userVote.percent === sliderValue) {
+      setVoteMessage('Already Voted');
+    }
+
+    if (userVote.isVoted && userVote.percent !== sliderValue) {
+      setVoteMessage('Change Vote');
+    }
+
+    const feedback = getFeedbackText(sliderValue);
+    setFeedbackText(feedback);
+  }, [sliderValue]);
+
+    // if user has already voted, set the slider
+    useEffect(() => {
+      // if the user has voted
+      if (userVote.isVoted) {
+        // set the slider to current percent
+        setSliderValue(userVote.percent);
+        setVoteMessage('Already Voted');
+      }
+
+      // update the feedback text
+      const feedback = getFeedbackText(userVote.percent);
+      setFeedbackText(feedback);
+    }, [userVote]);
+
   return (
-    <Flex flexDirection="column" alignItems="center" minWidth="100%" borderRadius="10px" border="1px white solid" padding="20px">
+    <Flex flexDirection="column" alignItems="center" minWidth="100%" borderRadius="10px" border="2px #5e317a solid" padding="20px">
       <Box width="100%" marginBottom="20px" position="relative">
-        <Text textAlign="center"> Sua opnião sobre este post</Text>
+        <Text textAlign="center" color={"#b4d701"}> Sua opnião sobre este post</Text>
         <Slider 
           min={-10000} 
           max={10000} 
@@ -71,7 +112,7 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, user, author, per
           <span role="img" aria-label="Skateboard" style={skateEmojiStyle}>{emojiByAmount[sliderValue.toString()]}</span>
         </Slider>
         <Text color="white" mt={2} textAlign="center">
-          {getFeedbackText(sliderValue)}
+          {feedbackText}
         </Text>
       </Box>
       <Flex justifyContent="flex-end" width="100%" alignItems="flex-end">
@@ -83,10 +124,16 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, user, author, per
           p={2}
           onClick={handleVote}
           _hover={{ bg: 'white', color: 'black' }}
+          isDisabled={userVote.isVoted && userVote.percent === sliderValue}
         >
-          Votar
+          {voteMessage}
         </Button>
       </Flex>
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        errorMessage="Voting Error, Pepe is Confused!"
+      />
     </Flex>
   );
 }

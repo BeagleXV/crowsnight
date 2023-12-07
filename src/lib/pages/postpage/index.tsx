@@ -157,7 +157,7 @@ const PostPage: React.FC = () => {
 
   const commentTitleStyle = {
     fontWeight: 'bold',
-    color: '#d9d5a0',
+    color: '#b4d701',
     fontSize: '20px',
     paddingBottom: '8px',
   };
@@ -230,7 +230,7 @@ useEffect(() => {
     maxWidth: isDesktop ? '50%' : '100%',
     margin: '0 auto',
     padding: '10px',
-    border: '2px solid white',
+    border: '2px solid #5e317a',
     borderRadius: '10px',
   };
 
@@ -242,7 +242,7 @@ useEffect(() => {
   };
   const titleStyle = {
     fontWeight: 'bold',
-    color: '#d9d5a0',
+    color: '#b4d701',
     fontSize: '26px',
     padding: '20px',
     borderRadius: '10px',
@@ -273,7 +273,7 @@ useEffect(() => {
             maxWidth: isDesktop ? '50%' : '100%',
             margin: '0 auto',
             padding: '10px',
-            border: '1px solid white',
+            border: '2px solid #5e317a',
             borderRadius: '10px',
           }}
         >
@@ -288,14 +288,15 @@ useEffect(() => {
           <center>
             <h1 style={commentTitleStyle}>Comente algo sobre o post...</h1>
           </center>
-          <Box minWidth="100%" border="1px solid white" borderRadius="10px" padding="10px" margin="3px">
+          <Box minWidth="100%" border="2px solid #5e317a" borderRadius="10px" padding="10px" margin="3px">
             <Textarea
-              border="1px solid white"
+              border="1px solid #5e317a"
               value={commentContent}
+              color={"white"}
               onChange={(e) => setCommentContent(e.target.value)}
               placeholder="Escreva seu comentário..."
             />
-            <Button border="1px solid white" mt="10px" onClick={handlePostComment} color="white" backgroundColor="black">
+            <Button border=" 2px solid #5e317a" mt="10px" onClick={handlePostComment} color="#b4d701" backgroundColor="black">
               Postar comentário
             </Button>
           </Box>
@@ -348,7 +349,7 @@ useEffect(() => {
       </Flex>
       <Flex>
         <Link to="/">
-          <Button variant="outline" colorScheme="red" size="sm" marginBottom="10px">
+        <Button border=" 2px solid #5e317a" mt="10px" color="#b4d701" backgroundColor="black">
             Voltar
           </Button>
         </Link>

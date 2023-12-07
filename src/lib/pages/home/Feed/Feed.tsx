@@ -25,15 +25,10 @@ import { useEffect, useState } from "react";
 import PostModal from "./postModal/postModal";
 import ErrorModal from "./postModal/errorModal";
 import { useNavigate, Link } from "react-router-dom";
-
 import * as Types from "./types";
 import { css } from "@emotion/react";
-
 import EarningsModal from "./postModal/earningsModal"; // Replace with the correct path to EarningsModal
 import { MdArrowUpward } from 'react-icons/md';
-import axios from "axios";
-import { AxiosResponse } from 'axios';
-import { Style } from "util";
 interface ErrorModalProps {
   isOpen: boolean;
   onClose: () => void;

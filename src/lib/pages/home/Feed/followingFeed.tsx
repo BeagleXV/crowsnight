@@ -54,7 +54,7 @@ import {
   
   const randomSentences = [
     // "Have a spooky Skateboarding!",
-    "Rock'n Roll Bloder!",
+  "Rock'n Roll Bloder!",
   "Viva satã!",
   "Vou beber até vomitar sangue.",
   "Isso é Crow's Night!",
@@ -76,7 +76,7 @@ import {
   
   const FollowingFeed: React.FC<Types.HiveBlogProps> = ({
     queryType = "created",
-    tag = process.env.COMMUNITY || 'hive-173115'
+    tag = process.env.COMMUNITY || 'crowsnight666'
     
   }) => {
 
