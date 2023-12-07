@@ -164,7 +164,7 @@ const Chat: React.FC = () => {
       try {
         if (response.success) {
           setCommentContent('');
-          console.log("Comment posted successfully");
+          
   
           // Fetch comments immediately after posting a comment
           fetchComments();

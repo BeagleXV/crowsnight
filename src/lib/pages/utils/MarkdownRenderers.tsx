@@ -35,12 +35,12 @@ export const MarkdownRenderers = {
         </span>
       ),
       
-a: ({ children, ...props }: RendererProps) => <a {...props} style={{ color: '#D9D5A0' }}> {children}</a>,
+a: ({ children, ...props }: RendererProps) => <a {...props} style={{ color: '#b4d701' }}> {children}</a>,
 p: ({ children, ...props }: RendererProps) => <p {...props} style={{ color: 'white', fontSize: '18px', paddingBottom: '15px' }}>{children}</p>,
-h1: ({ children, ...props }: RendererProps) => <h1 {...props} style={{ fontWeight: 'bold', color: '#D9D5A0', fontSize: '26px', paddingBottom: '10px' , paddingTop:"10px" }}>{children}</h1>,
-h2: ({ children, ...props }: RendererProps) => <h2 {...props} style={{ fontWeight: 'bold', color: '#D9D5A0', fontSize: '20px', paddingBottom: '8px' , paddingTop:"10px"}}>{children}</h2>,
-h3: ({ children, ...props }: RendererProps) => <h3 {...props} style={{ fontWeight: 'bold', color: '#D9D5A0', fontSize: '18px', paddingBottom: '6px' , paddingTop:"10px"}}>{children}</h3>,
-h4: ({ children, ...props }: RendererProps) => <h4 {...props} style={{ fontWeight: 'bold', color: '#D9D5A0', fontSize: '16px', paddingBottom: '4px' , paddingTop:"10px"}}>{children}</h4>,
+h1: ({ children, ...props }: RendererProps) => <h1 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '26px', paddingBottom: '10px' , paddingTop:"10px" }}>{children}</h1>,
+h2: ({ children, ...props }: RendererProps) => <h2 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '20px', paddingBottom: '8px' , paddingTop:"10px"}}>{children}</h2>,
+h3: ({ children, ...props }: RendererProps) => <h3 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '18px', paddingBottom: '6px' , paddingTop:"10px"}}>{children}</h3>,
+h4: ({ children, ...props }: RendererProps) => <h4 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '16px', paddingBottom: '4px' , paddingTop:"10px"}}>{children}</h4>,
 blockquote: ({ children, ...props }: RendererProps) => (
   <div
     style={{

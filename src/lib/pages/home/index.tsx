@@ -1,9 +1,6 @@
 import { Flex, Tabs, TabList, Tab, TabPanels, TabPanel, useTabs,Image, VStack, Text, } from "@chakra-ui/react";
 import HiveBlog from "./Feed/Feed";
-import HiveVideos from "./videos/FeedVideo";
-import SnapShot from "./dao/snapshot";
 import Chat from "./chat";
-import QFS from "../qfs";
 import NewUpload from "../upload/newUpload";
 import Equipe from "./equipe";
 import Store from "./store";

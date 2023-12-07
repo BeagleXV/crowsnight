@@ -58,7 +58,7 @@ const PostFooter: React.FC<Types.PostFooterProps> = ({ onClose, user, author, pe
     }
 
     if (userVote.isVoted && userVote.percent !== sliderValue) {
-      setVoteMessage('Change Vote');
+      setVoteMessage('Mudar o voto');
     }
 
     const feedback = getFeedbackText(sliderValue);

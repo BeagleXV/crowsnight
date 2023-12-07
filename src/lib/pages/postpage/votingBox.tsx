@@ -13,7 +13,7 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, author, permlink,
   const [sliderValue, setSliderValue] = useState(5000);
 
   const [feedbackText, setFeedbackText] = useState(''); // Track feedback text
-  const [voteMessage, setVoteMessage] = useState('Vote'); // Track vote button text
+  const [voteMessage, setVoteMessage] = useState('Votar'); // Track vote button text
 
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false); // Track modal visibility
 
@@ -40,7 +40,7 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, author, permlink,
       userVote.isVoted = true;
       userVote.percent = sliderValue;
 
-      setVoteMessage('Already Voted');
+      setVoteMessage('Você já votou');
       const feedback = getFeedbackText(sliderValue);
       setFeedbackText(feedback);
     } catch (error) {
@@ -70,11 +70,11 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, author, permlink,
   useEffect(() => {
     // if the current vote is equal to slider, vote message is Already Voted
     if (userVote.isVoted && userVote.percent === sliderValue) {
-      setVoteMessage('Already Voted');
+      setVoteMessage('Você já votou');
     }
 
     if (userVote.isVoted && userVote.percent !== sliderValue) {
-      setVoteMessage('Change Vote');
+      setVoteMessage('Mudar o voto');
     }
 
     const feedback = getFeedbackText(sliderValue);
@@ -87,7 +87,7 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, author, permlink,
       if (userVote.isVoted) {
         // set the slider to current percent
         setSliderValue(userVote.percent);
-        setVoteMessage('Already Voted');
+        setVoteMessage('Você já votou');
       }
 
       // update the feedback text
@@ -118,9 +118,9 @@ const VotingBox: React.FC<Types.PostFooterProps> = ({ onClose, author, permlink,
       <Flex justifyContent="flex-end" width="100%" alignItems="flex-end">
         <Button
           bg="black"
-          color="white"
+          color="#b4d701"
           borderRadius="4px"
-          border="1px solid white"
+          border="1px solid #5e317a"
           p={2}
           onClick={handleVote}
           _hover={{ bg: 'white', color: 'black' }}
