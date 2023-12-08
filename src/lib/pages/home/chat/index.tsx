@@ -111,7 +111,6 @@ const Chat: React.FC = () => {
   }, [isChatVisible]);
   
   const commentTitleStyle = {
-    fontWeight: 'bold',
     color: 'yellow',
     fontSize: '20px',
     paddingLeft: '10px',

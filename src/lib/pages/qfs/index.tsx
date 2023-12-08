@@ -284,7 +284,6 @@ export default function QFS() {
       ) : (
         <Text
           fontSize="2xl"
-          fontWeight="bold"
           marginBottom={ 10 }
         >
           Login to save your stats!
@@ -344,7 +343,6 @@ export default function QFS() {
         >
           <Text
             fontSize="3xl"
-            fontWeight="bold"
           >
             Leaderboard
           </Text>
@@ -402,7 +400,6 @@ export default function QFS() {
 >
   <Text
     fontSize="3xl"
-    fontWeight="bold"
   >
     Best Times
   </Text>
