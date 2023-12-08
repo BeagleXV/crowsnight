@@ -3,11 +3,15 @@ import { Link as ChakraLink } from "@chakra-ui/react";
 
 import { useState, useEffect } from "react";
 import SendHiveModal from "./sendHiveModal";
+import SendHBDModal from "./sendHBDmodal";
 import useAuthUser from "lib/pages/home/api/useAuthUser";
 import * as dhive from "@hiveio/dhive";
 // import WalletTransactions from "lib/pages/home/dao/components/hiveGnars/txHistory";
+import PowerUpModal from "./powerUpModal";
+import PowerDownModal from "./powerDownModal";
+import DelegationModal from "./delegationModal";
+import { useFetcher } from "react-router-dom";
 
-import FiatBalance from "../fiat/fiat";
 
 const dhiveClient = new dhive.Client([
   "https://api.hive.blog",
@@ -30,6 +34,8 @@ interface User {
   delegated_vesting_shares: string;
   received_vesting_shares: string;
   name?: string;
+  posting_json_metadata?: string;
+  metadata: any;
 }
 
 // send to utils.tsx
@@ -40,10 +46,21 @@ export function resetCache() {
   cache.conversionRate = undefined;
   cache.hbdPrice = undefined;
   console.log("Cache reset");
-
-
 }
 // send to utils.tsx
+
+
+const styles = `
+  @keyframes glow {
+    0% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+`;
+
 export async function fetchHbdPrice() {
   try {
     if (cache.hbdPrice !== undefined) {
@@ -94,8 +111,14 @@ export default function HiveBalanceDisplay2() {
   const [totalWorth, setTotalWorth] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hiveMemo, setHiveMemo] = useState("");
-
-
+  const [showPowerUpModal, setShowPowerUpModal] = useState(false);
+  const [showPowerDownModal, setShowPowerDownModal] = useState(false);
+  const [showDelegationModal, setShowDelegationModal] = useState(false);
+  const [sendHBDmodal, setSendHBDmodal] = useState(false);
+  const [ownedTotal, setOwnedTotal] = useState<number>(0);
+  const [profileImage, setProfileImage] = useState<string>("https://i.gifer.com/origin/f1/f1a737e4cfba336f974af05abab62c8f_w200.gif");
+  const [delegatedToUserInUSD, setDelegatedToUserInUSD] = useState<string>("0");
+  const [HPdelegatedToUser, setHPdelegatedToUser] = useState<string>("0");
 
   const convertVestingSharesToHivePower = async (
     vestingShares: string,
@@ -103,10 +126,13 @@ export default function HiveBalanceDisplay2() {
     receivedVestingShares: string
   ) => {
     const vestingSharesFloat = parseFloat(vestingShares.split(" ")[0]);
+    console.log("vestingSharesFloat", vestingSharesFloat)
     const delegatedVestingSharesFloat = parseFloat(delegatedVestingShares.split(" ")[0]);
+    console.log("delegatedVestingSharesFloat", delegatedVestingSharesFloat)
     const receivedVestingSharesFloat = parseFloat(receivedVestingShares.split(" ")[0]);
-    const availableVESTS =
-      vestingSharesFloat - delegatedVestingSharesFloat + receivedVestingSharesFloat;
+    console.log("receivedVestingSharesFloat", receivedVestingSharesFloat)
+    const availableVESTS = vestingSharesFloat - delegatedVestingSharesFloat ;
+    console.log("availableVESTS", availableVESTS)
 
     const response = await fetch('https://api.hive.blog', {
       method: 'POST',
@@ -122,18 +148,39 @@ export default function HiveBalanceDisplay2() {
     const vestHive =
       (parseFloat(result.result.total_vesting_fund_hive) * availableVESTS) /
       parseFloat(result.result.total_vesting_shares);
-
-    const delegatedHivePower =
+    
+    const DelegatedToSomeoneHivePower =
       (parseFloat(result.result.total_vesting_fund_hive) * delegatedVestingSharesFloat) /
       parseFloat(result.result.total_vesting_shares);
 
+    const delegatedToUserInUSD = (parseFloat(result.result.total_vesting_fund_hive) * receivedVestingSharesFloat) /
+    parseFloat(result.result.total_vesting_shares);
+    const HPdelegatedToUser = (parseFloat(result.result.total_vesting_fund_hive) * receivedVestingSharesFloat) /
+    parseFloat(result.result.total_vesting_shares);
     return {
-      hivePower: vestHive.toFixed(3),
-      delegatedHivePower: delegatedHivePower.toFixed(3),
+      hivePower: vestHive.toFixed(3), 
+      DelegatedToSomeoneHivePower: DelegatedToSomeoneHivePower.toFixed(3),
+      delegatedToUserInUSD: delegatedToUserInUSD.toFixed(3),
+      HPdelegatedToUser: HPdelegatedToUser.toFixed(3),
     };
+
   };
 
-  
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      if (user) {
+        try {
+          const metadata = JSON.parse(user.posting_json_metadata || '');
+          setProfileImage(metadata.profile.profile_image);
+        } catch (error) {
+          console.error('Error parsing JSON metadata:', error);
+        }
+      }
+    };
+    fetchProfileImage();
+  }
+  , [user]);
+
 
   const onStart = async function () {
     if (user) {
@@ -147,22 +194,28 @@ export default function HiveBalanceDisplay2() {
             user.received_vesting_shares
           ),
         ]);
-  
+
         const hiveWorth = parseFloat(user.balance.split(" ")[0]) * conversionRate;
         const hivePowerWorth =
-          (parseFloat(vestingSharesData.hivePower) + parseFloat(vestingSharesData.delegatedHivePower)) *
+          (parseFloat(vestingSharesData.hivePower) + parseFloat(vestingSharesData.DelegatedToSomeoneHivePower)) *
           conversionRate;
         const hbdWorth = parseFloat(user.hbd_balance.split(" ")[0]) * hbdPrice;
+        const delegatedToUserInUSD = parseFloat(vestingSharesData.delegatedToUserInUSD) * conversionRate;
         const savingsWorth = parseFloat(user.savings_hbd_balance.split(" ")[0]) * hbdPrice;
-  
-        const total = hiveWorth + hivePowerWorth + hbdWorth + savingsWorth;
+        const HPdelegatedToUser = parseFloat(vestingSharesData.HPdelegatedToUser) 
+        const total = hiveWorth + hivePowerWorth + hbdWorth + savingsWorth + delegatedToUserInUSD; 
+        const total_Owned = Number(hiveWorth) + Number(savingsWorth) + Number(hbdWorth) + Number(hivePowerWorth) ;
         setConversionRate(conversionRate);
         setHbdBalance(user.hbd_balance);
         setHiveBalance(user.balance);
         setSavingsBalance(user.savings_hbd_balance);
-        setHivePower(`${vestingSharesData.hivePower} + ${vestingSharesData.delegatedHivePower} (delegated)`);
+        setHivePower(`${vestingSharesData.DelegatedToSomeoneHivePower} (delegated to others)  + ${vestingSharesData.hivePower} (not delegated)`);
         setTotalWorth(total);
         setIsLoading(false);
+        setOwnedTotal(total_Owned);
+        setDelegatedToUserInUSD(`${delegatedToUserInUSD.toFixed(3).toString()} USD worth in HP`); 
+        setHPdelegatedToUser(`${HPdelegatedToUser.toFixed(3).toString()} HP delegated to you`);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -174,183 +227,260 @@ export default function HiveBalanceDisplay2() {
   }, [user]);
   
 
-  useEffect(() => {
-    onStart();
-  }, [user]);
-
-
   const handleOpenModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault(); // Prevent the default button click behavior
-    console.log(user);
     setShowModal(true);
-    console.log(showModal)
   };
   
-
   const handleLogoClick = (balanceType: string) => {
     console.log(`Clicked ${balanceType} logo`);
-    console.log(user);
   };
-  
+  const handleOpenPowerUpModal = () => {
+    setShowPowerUpModal(true);
+  };
+  const handleOpenPowerDownModal = () => {
+    setShowPowerDownModal(true);
+  };
+  const handleOpenDelegationModal = () => {
+    setShowDelegationModal(true);
+  };
+  const handleOpenSendHBDModal = () => {
+    setSendHBDmodal(true);
+  }
   return (
     <Box
-        borderRadius="12px"
-        border="3px solid #5e317a"
-        padding="10px"
-        maxWidth={{ base: "100%", md: "50%" }}
-        >
-        <VStack spacing={4} align="stretch">
-            <Flex alignItems="center" justifyContent="center" padding="10px">
-            <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-      >
-        {user ? (
-          <>
-            <Image
-              src={`https://images.hive.blog/u/${user.name}/avatar`}
-              alt="profile avatar"
-              borderRadius="20px"
-              border="4px solid #d7a917"
-              boxSize="80px"
-            />
-            <Text fontSize="32px" padding="10px" color="#b4d701">
-              {user.name}
-            </Text>
-          </>
+      borderRadius="12px"
+      border="2px solid red"
+      padding="10px"
+      maxWidth={{ base: "100%", md: "100%" }}
+    >
+      <VStack spacing={4} align="stretch">
+        <Flex alignItems="center" justifyContent="center" padding="10px">
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
+            {user ? (
+              <Flex>
+                <>
+                  <Image
+                    src={profileImage}
+                    alt="profile avatar"
+                    borderRadius="20px"
+                    border="2px solid limegreen"
+                    boxSize="80px"
+                  />
+                  <Text fontSize="32px" padding="10px" color="white">
+                    {user.name}
+                  </Text>
+
+                </>
+
+              </Flex>
+            ) : (
+              <>
+                <Image
+                  src={DEFAULT_AVATAR_URL}
+                  alt="pepito"
+                  borderRadius="20px"
+                  boxSize="60px"
+                />
+              </>
+            )}
+          </Box>
+        </Flex>
+        <Divider backgroundColor="red" />
+        <VStack>
+                  <Button
+                    width="100%"
+                    borderRadius="10px"
+                    border="1px dashed yellow"
+                    justifyContent="center"
+                    bg={"black"}
+                    color={"white"}
+                    _hover={{ bg: "grey" }}
+                    onClick={handleOpenPowerUpModal}
+                  >
+                    🔺 Power Up
+                  </Button>
+                  <Button
+                    width="100%"
+                    borderRadius="10px"
+                    border="1px dashed yellow"
+                    justifyContent="center"
+                    bg={"black"}
+                    color={"white"}
+                    _hover={{ bg: "grey" }}
+                    onClick={handleOpenPowerDownModal}
+                  >
+                    🔻 Power Down
+                  </Button>
+                  
+                </VStack>
+        {isLoading ? (
+          <center>
+            <Image width="60px" src="https://i.gifer.com/ZZ5H.gif" alt="loading" />
+            <Text color="white">Loading...</Text>
+          </center>
         ) : (
           <>
-            <Image
-              src={DEFAULT_AVATAR_URL}
-              alt="pepito"
-              borderRadius="20px"
-              boxSize="60px"
-            />
-          </>
-        )}
-      </Box>
+            <Flex alignItems="center" justifyContent="center">
+              <VStack>
 
+              <Text fontWeight="bold" color="orange">
+                Total Owned: ${ownedTotal.toFixed(2)}
+              </Text>
+              <Text fontWeight="bold" color="orange">
+                Wallet Worth: ${totalWorth.toFixed(2)}
+              </Text>
+              </VStack>
             </Flex>
             <Divider backgroundColor="red" />
-
-            {isLoading ? (
-                <Text color="white">Loading...</Text>
-            ) : (
-                <>
-                    <Flex alignItems="center" justifyContent="center">
-                        <Text color="#b4d701">Wallet Worth: ${totalWorth.toFixed(2)}</Text>
-                    </Flex>
-                    <Divider backgroundColor="red" />
-                    <HStack spacing={4} align="stretch">
-                        <BalanceDisplay 
-                          label="Hive"
-                          labelStyle={{ color: "#b4b701" }} 
-                          balance={hiveBalance} 
-                          labelTooltip="Native Token of Hive Blockchain"
-                          balanceTooltip="Hive tokens are like digital coins on the Hive blockchain, and they have different uses. You can vote on stuff, get premium features, and help with the network and decision-making by staking them. They also reward content makers, keep users engaged, and you can trade them elsewhere. They basically keep Hive running, adding value and community vibes. 🛹🚀
-                         " ></BalanceDisplay>
-                        <BalanceDisplay 
-                          label="Hive Power"
-                          labelStyle={{ color: "#b4b701" }} 
-                          balance={hivePower} 
-                          labelTooltip="Hive Power signifies influence, voting, and status within Hive blockchain. 🚀🤝"
-                          balanceTooltip="Hive Power represents a user's influence and engagement within the Hive blockchain. It's like your reputation and impact score on the platform. When you ´power up Hive tokens by converting liquid Hive into Hive Power, you increase your ability to vote on content and participate in network governance. This boosts your say in decision-making and supports the Hive ecosystem's stability and decentralization. It's like investing in your standing and community involvement on Hive. 🚀🤝s"
-                          />
-
-                    </HStack>
-                    <HStack spacing={4} align="stretch">
-                        <BalanceDisplay 
-                          label="Dollar Savings" 
-                          balance={savingsBalance}
-                          labelStyle={{ color: "#b4b701" }} 
-                          labelTooltip="Hive Savings are like a savings account for your HBD tokens. 🚀🤝"
-                          balanceTooltip="Picture it like planting some Hive coins, but in this case, they're Hive Backed Dollars (HBD), kind of like specialized cannabis strains. You nurture them over time, and they steadily grow. With a 20% increase each year, it's like cultivating a thriving HBD garden. You're investing your time and care, and eventually, you'll have a bountiful harvest of HBD, just like some potent homegrown herb. So, you're tending to your HBD crop, man, and it's growing just as nicely as your favorite buds. 🌱💵🚀"
-                          />
-                        <BalanceDisplay 
-                          label="Hive Dollar" 
-                          balance={hbdBalance} 
-                          labelTooltip="Hive Backed Dollar (HBD) is a stablecoin pegged to the US Dollar"
-                          balanceTooltip="Hive Backed Dollars (HBD) are a stablecoin on the Hive blockchain designed to maintain a value close to one United States dollar. They are backed by Hive cryptocurrency held in a collateralized debt position. HBD provides users with a stable and reliable digital currency for transactions, making it a practical choice for everyday use within the Hive ecosystem." 
-                          labelLink='https://giveth.io/es/project/skatehive-skateboarding-community'
+            <HStack spacing={4} align="stretch">
+              <BalanceDisplay
+                label="Hive"
+                balance={hiveBalance}
+                labelTooltip="Native Token of Hive Blockchain"
+                balanceTooltip="Hive tokens are like digital coins on the Hive blockchain, and they have different uses. You can vote on stuff, get premium features, and help with the network and decision-making by staking them. They also reward content makers, keep users engaged, and you can trade them elsewhere. They basically keep Hive running, adding value and community vibes. 🛹🚀"
+              ></BalanceDisplay>
+              <BalanceDisplay
+                label="Hive Power"
+                balance={hivePower}
+                labelTooltip="Hive Power signifies influence, voting, and status within Hive blockchain. 🚀🤝"
+                balanceTooltip="Hive Power represents a user's influence and engagement within the Hive blockchain. It's like your reputation and impact score on the platform. When you ´power up Hive tokens by converting liquid Hive into Hive Power, you increase your ability to vote on content and participate in network governance. This boosts your say in decision-making and supports the Hive ecosystem's stability and decentralization. It's like investing in your standing and community involvement on Hive. 🚀🤝s"
+              />
+  
+            </HStack>
+            <HStack spacing={4} align="stretch">
+              <BalanceDisplay
+                label="Dollar Savings"
+                balance={savingsBalance}
+                labelTooltip="Hive Savings are like a savings account for your HBD tokens. 🚀🤝"
+                balanceTooltip="Picture it like planting some Hive coins, but in this case, they're Hive Backed Dollars (HBD), kind of like specialized cannabis strains. You nurture them over time, and they steadily grow. With a 20% increase each year, it's like cultivating a thriving HBD garden. You're investing your time and care, and eventually, you'll have a bountiful harvest of HBD, just like some potent homegrown herb. So, you're tending to your HBD crop, man, and it's growing just as nicely as your favorite buds. 🌱💵🚀"
+              />
+              <BalanceDisplay
+                label="Hive Dollar"
+                balance={hbdBalance}
+                labelTooltip="Hive Backed Dollar (HBD) is a stablecoin pegged to the US Dollar"
+                balanceTooltip="Hive Backed Dollars (HBD) are a stablecoin on the Hive blockchain designed to maintain a value close to one United States dollar. They are backed by Hive cryptocurrency held in a collateralized debt position. HBD provides users with a stable and reliable digital currency for transactions, making it a practical choice for everyday use within the Hive ecosystem."
+                labelLink='https://giveth.io/es/project/skatehive-skateboarding-community'
+  
+              />
+            </HStack>
+            <Divider backgroundColor="red" />
+            <BalanceDisplay
+              label="Delegated to You"
+              balance={HPdelegatedToUser}
+              labelTooltip="How much HivePower People is delegating to You 🚀🤝"
+              
+              ></BalanceDisplay>
             
-                          />
-                    </HStack>
-                    <Tooltip 
-                        bg="black" 
-                        color="white" 
-                        borderRadius="10px" 
-                        border="1px dashed #5e317a" 
-                        label="Buy hive using other crypto">
-
-                    <HStack
-                        margin="10px"
-                        borderRadius="10px"
-                        border="1px dashed #5e317a"
-                        justifyContent="center"
-                        padding="10px"
-                    >
-                        <Image
-                            src="https://images.ecency.com/u/hive-173115/avatar/large"
-                            alt="Avatar"
-                            width="20px"
-                            height="20px"
-                        />
-                        <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px" color={"#b4d701"} >Buy HIVE </ChakraLink>
-                    </HStack>
-                    </Tooltip>
-
-                   <Tooltip 
-                        bg="black" 
-                        color="white" 
-                        borderRadius="10px" 
-                        border="1px dashed limegreen" 
-                        label="Dont! power up!">
-                    <HStack
-                        margin="10px"
-                        borderRadius="10px"
-                        border="1px dashed #5e317a"
-                        justifyContent="center"
-                        padding="10px"
-                    >
-                        <Image
-                            src="https://images.ecency.com/u/hive-173115/avatar/large"
-                            alt="Avatar"
-                            width="20px"
-                            height="20px"
-                        />
-                        <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px" color={"#b4d701"}>Sell Hive  </ChakraLink>
-                    </HStack>
-                    </Tooltip>
-                    <Button                          margin="10px"
-                        colorScheme="purple"
-                        color={"#b4d701"}
-                        borderRadius="10px"
-                        justifyContent="center"
-                        padding="10px" onClick={handleOpenModal}>
-                            Enviar
-                          </Button>
-                </>
-            )}
-        </VStack>
-        <SendHiveModal
-  showModal={showModal}
-  setShowModal={setShowModal}
-  toAddress={toAddress}
-  setToAddress={setToAddress}
-  amount={amount}
-  setAmount={setAmount}
-  hiveMemo={hiveMemo} // Make sure to pass hiveMemo here
-  setHiveMemo={setHiveMemo}
-/>
-
+            <Tooltip
+              bg="black"
+              color="white"
+              borderRadius="10px"
+              border="1px dashed limegreen"
+              label="Buy hive using other crypto"
+            >
+              <HStack
+                margin="10px"
+                borderRadius="10px"
+                border="1px dashed orange"
+                justifyContent="center"
+                padding="10px"
+              >
+                <Image
+                  src="https://images.ecency.com/u/hive-173115/avatar/large"
+                  alt="Avatar"
+                  width="20px"
+                  height="20px"
+                />
+                <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px">Buy HIVE </ChakraLink>
+              </HStack>
+            </Tooltip>
+  
+            <Tooltip
+              bg="black"
+              color="white"
+              borderRadius="10px"
+              border="1px dashed limegreen"
+              label="Dont! power up!"
+            >
+              <HStack
+                margin="10px"
+                borderRadius="10px"
+                border="1px dashed orange"
+                justifyContent="center"
+                padding="10px"
+              >
+                <Image
+                  src="https://images.ecency.com/u/hive-173115/avatar/large"
+                  alt="Avatar"
+                  width="20px"
+                  height="20px"
+                />
+                <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px">Sell Hive  </ChakraLink>
+              </HStack>
+            </Tooltip>
+            <Button
+              margin="10px"
+              borderRadius="10px"
+              border="1px dashed yellow"
+              justifyContent="center"
+              padding="10px" onClick={handleOpenModal}>
+              SEND HIVE
+            </Button>
+            <Button
+              margin="10px"
+              borderRadius="10px"
+              border="1px dashed yellow"
+              justifyContent="center"
+              padding="10px" onClick={handleOpenSendHBDModal}>
+              SEND HBD
+            </Button>
+            <Button
+              margin="10px"
+              borderRadius="10px"
+              border="1px dashed yellow"
+              justifyContent="center"
+              padding="10px"
+              onClick={handleOpenDelegationModal}
+            >
+             👑 Delegate Hive Power to SkateHive 👑
+            </Button>
+          </>
+        )}
+      </VStack>
+      <SendHiveModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        toAddress={toAddress}
+        setToAddress={setToAddress}
+        amount={amount}
+        setAmount={setAmount}
+        hiveMemo={hiveMemo} // Make sure to pass hiveMemo here
+        setHiveMemo={setHiveMemo}
+      />
+            <SendHBDModal
+        showModal={sendHBDmodal}
+        setShowModal={setSendHBDmodal}  
+        toAddress={toAddress}
+        setToAddress={setToAddress}
+        amount={amount}
+        setAmount={setAmount}
+        hiveMemo={hiveMemo} // Make sure to pass hiveMemo here
+        setHiveMemo={setHiveMemo}
+      />
+  
       {/* <WalletTransactions wallet={user?.name || ""} /> */}
-      
+      <PowerUpModal isOpen={showPowerUpModal} onClose={() => setShowPowerUpModal(false)} user={user} />
+      <PowerDownModal isOpen={showPowerDownModal} onClose={() => setShowPowerDownModal(false)} user={user} />
+      <DelegationModal isOpen={showDelegationModal} onClose={() => setShowDelegationModal(false)} user={user} />
     </Box>
-
-    
-);
+  );
+  
 };
 
 const BalanceDisplay = ({
@@ -375,15 +505,15 @@ balanceStyle?: React.CSSProperties;
 return (
 <Box
   borderRadius="5px"
-  border="3px solid #5e317a"
-  width="50%"
+  border="1px solid red"
+  width="100%"
   padding="10px"
   textAlign="center"
 >
   {labelTooltip ? (
     <Tooltip label={labelTooltip} bg="black" color="white" borderRadius="10px" border="1px dashed limegreen">
       {labelLink ? (
-        <ChakraLink color="#b4d701" href={labelLink} isExternal style={labelStyle}>
+        <ChakraLink color="white" fontWeight="bold"  href={labelLink} isExternal style={labelStyle}>
           {label}
         </ChakraLink>
       ) : (
@@ -394,11 +524,11 @@ return (
     </Tooltip>
   ) : (
     labelLink ? (
-      <ChakraLink color="#b4d701" fontWeight="bold"  href={labelLink} isExternal style={labelStyle}>
+      <ChakraLink color="white" fontWeight="bold"  href={labelLink} isExternal style={labelStyle}>
         {label}
       </ChakraLink>
     ) : (
-      <Text color="#b4d701" style={labelStyle}>
+      <Text color="white" fontWeight="bold" style={labelStyle}>
         {label}
       </Text>
     )
@@ -422,6 +552,7 @@ return (
       <Text style={balanceStyle}>{balance || "Loading..."}</Text>
     )
   )}
+
 </Box>
 );
 };

@@ -737,9 +737,8 @@ const username = user?.name;
                   onChange={handleTitleChange}
                   placeholder="Escreva o seu título..."
                   fontSize="xl"
-color={'white'}
-                  fontWeight="bold"
-borderColor="#5E317A"
+                  color={'white'}
+                  borderColor="#5E317A"
                 />
               </Box>
 
