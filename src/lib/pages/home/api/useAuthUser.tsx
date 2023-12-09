@@ -10,7 +10,13 @@ interface HiveKeychainResponse {
 // Define the Account type
 interface Account {
   name: string;
+  reward_hbd_balance: string | dhive.Asset; 
+  reward_hive_balance: string | dhive.Asset;
+  reward_vesting_balance: string | dhive.Asset;
+  reward_vesting_hive: string | dhive.Asset;
+  posting_json_metadata: string;
 }
+
 
 export type AuthUser = {
   user: Account | null;
@@ -19,7 +25,7 @@ export type AuthUser = {
   isLoggedIn: () => boolean;
 };
 
-export default function useAuthUser(): AuthUser {
+function useAuthUser(): AuthUser {
   const dhiveClient = new dhive.Client([
     "https://api.hive.blog",
     "https://api.hivekings.com",
@@ -55,7 +61,6 @@ export default function useAuthUser(): AuthUser {
       "Posting",
       async (response: HiveKeychainResponse) => {
         if (response.success === true) {
-          console.log(response);
           const publicKey = response.publicKey;
           try {
             const val = await dhiveClient.keys.getKeyReferences([publicKey]);
@@ -84,9 +89,15 @@ export default function useAuthUser(): AuthUser {
     );
   };
 
+  
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+
+    // remove 3speak auth data
+    localStorage.removeItem("3SpeakUser");
+    localStorage.removeItem("3SpeakToken");
+
     window.location.reload();
   };
 
@@ -101,3 +112,5 @@ export default function useAuthUser(): AuthUser {
     isLoggedIn,
   };
 }
+
+export default useAuthUser;

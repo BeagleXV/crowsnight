@@ -210,7 +210,7 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
 
           
             <Input
-              placeholder="60 🩸"
+              placeholder="13 🩸 trevosa"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               readOnly
@@ -244,7 +244,7 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
           {/* Botão para redefinir a confirmação do endereço */}
           {isAddressConfirmed && (
             <Button colorScheme="purple" color={"#b4d701"} onClick={resetAddressConfirmation}>
-              Redefinir Endereço
+              Corrigir Endereço
             </Button>
           )}
             <Input

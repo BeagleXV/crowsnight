@@ -21,6 +21,7 @@ import * as Types from './nft/types';
 import TestEvm from './testEvm/testEvm';
 import PortfolioPage from './evm/pioneerBalance';
 import SwapComponent from './hive/hiveSwapModal';
+import GnarsNfts from './nft/gnarsNfts';
 
 
 const Wallet = () => {
@@ -77,8 +78,9 @@ const Wallet = () => {
   <Box
     ml={{ base: 0, md: 4 }}
     width={{ base: '100%', md: '50%' }} // Full width on small screens, 50% width on medium and larger
-  >
-    <PortfolioPage wallet_address={ETHaddress} />
+  > 
+    {/* <PortfolioPage wallet_address={ETHaddress} /> */}
+    <GnarsNfts/>
   </Box>
 
 </Flex>

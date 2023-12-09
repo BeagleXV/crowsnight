@@ -214,7 +214,7 @@ export default function HiveBalanceDisplay2() {
         setIsLoading(false);
         setOwnedTotal(total_Owned);
         setDelegatedToUserInUSD(`${delegatedToUserInUSD.toFixed(3).toString()} USD worth in HP`); 
-        setHPdelegatedToUser(`${HPdelegatedToUser.toFixed(3).toString()} poder trevoso delegado para você`);
+        setHPdelegatedToUser(`${HPdelegatedToUser.toFixed(3).toString()} poder trevoso emprestado para você`);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -330,10 +330,10 @@ export default function HiveBalanceDisplay2() {
               <VStack>
 
               <Text fontSize={"x-large"} color="red">
-                Total de gotas de sangue: ${ownedTotal.toFixed(2)}
+                Total de gotas de sangue: R${ownedTotal.toFixed(2)}
               </Text>
               <Text fontSize={"larger"} color="red">
-                Total de gotas  de sangue na carteira: ${totalWorth.toFixed(2)}
+                Total de gotas  de sangue na carteira: R${totalWorth.toFixed(2)}
               </Text>
               </VStack>
             </Flex>
@@ -376,9 +376,9 @@ export default function HiveBalanceDisplay2() {
             </HStack>
             <Divider backgroundColor="red" />
             <BalanceDisplay
-              label="delegado para você"
+              label="emprestado para você"
               balance={HPdelegatedToUser}
-              labelTooltip="quanto poder trevoso as pessoas estão delegando para você"
+              labelTooltip="quanto poder trevoso as pessoas estão emprestando para você"
               
               ></BalanceDisplay>
             
