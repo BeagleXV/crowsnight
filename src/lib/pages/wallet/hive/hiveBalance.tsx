@@ -214,7 +214,7 @@ export default function HiveBalanceDisplay2() {
         setIsLoading(false);
         setOwnedTotal(total_Owned);
         setDelegatedToUserInUSD(`${delegatedToUserInUSD.toFixed(3).toString()} USD worth in HP`); 
-        setHPdelegatedToUser(`${HPdelegatedToUser.toFixed(3).toString()} HP delegated to you`);
+        setHPdelegatedToUser(`${HPdelegatedToUser.toFixed(3).toString()} poder trevoso delegado para você`);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -250,7 +250,7 @@ export default function HiveBalanceDisplay2() {
   return (
     <Box
       borderRadius="12px"
-      border="2px solid red"
+      border="2px solid #5e317a"
       padding="10px"
       maxWidth={{ base: "100%", md: "100%" }}
     >
@@ -269,10 +269,10 @@ export default function HiveBalanceDisplay2() {
                     src={profileImage}
                     alt="profile avatar"
                     borderRadius="20px"
-                    border="2px solid limegreen"
+                    border="2px solid #d7a917"
                     boxSize="80px"
                   />
-                  <Text fontSize="32px" padding="10px" color="white">
+                  <Text fontSize="32px" padding="10px" color="#b4d701">
                     {user.name}
                   </Text>
 
@@ -296,26 +296,26 @@ export default function HiveBalanceDisplay2() {
                   <Button
                     width="100%"
                     borderRadius="10px"
-                    border="1px dashed yellow"
+                    border="1px solid #5e317a"
                     justifyContent="center"
                     bg={"black"}
-                    color={"white"}
+                    color={"#b4d701"}
                     _hover={{ bg: "grey" }}
                     onClick={handleOpenPowerUpModal}
                   >
-                    🔺 Power Up
+                    🔺 Aumentar poder trevoso
                   </Button>
                   <Button
                     width="100%"
                     borderRadius="10px"
-                    border="1px dashed yellow"
+                    border="1px solid #5e317a"
                     justifyContent="center"
                     bg={"black"}
-                    color={"white"}
+                    color={"#b4d701"}
                     _hover={{ bg: "grey" }}
                     onClick={handleOpenPowerDownModal}
                   >
-                    🔻 Power Down
+                    🔻 Diminuir poder trevoso
                   </Button>
                   
                 </VStack>
@@ -329,51 +329,56 @@ export default function HiveBalanceDisplay2() {
             <Flex alignItems="center" justifyContent="center">
               <VStack>
 
-              <Text fontWeight="bold" color="orange">
-                Total Owned: ${ownedTotal.toFixed(2)}
+              <Text fontSize={"x-large"} color="red">
+                Total de gotas de sangue: ${ownedTotal.toFixed(2)}
               </Text>
-              <Text fontWeight="bold" color="orange">
-                Wallet Worth: ${totalWorth.toFixed(2)}
+              <Text fontSize={"larger"} color="red">
+                Total de gotas  de sangue na carteira: ${totalWorth.toFixed(2)}
               </Text>
               </VStack>
             </Flex>
             <Divider backgroundColor="red" />
             <HStack spacing={4} align="stretch">
               <BalanceDisplay
-                label="Hive"
+                label="Gotas de sangue"
+                labelStyle={{ color: '#b4d701' }}
                 balance={hiveBalance}
-                labelTooltip="Native Token of Hive Blockchain"
-                balanceTooltip="Hive tokens are like digital coins on the Hive blockchain, and they have different uses. You can vote on stuff, get premium features, and help with the network and decision-making by staking them. They also reward content makers, keep users engaged, and you can trade them elsewhere. They basically keep Hive running, adding value and community vibes. 🛹🚀"
+                labelTooltip="Dinheiro nativo da Crowsnight"
+                balanceTooltip="Pense nas gotas de sangue como fichas especiais que você usa para interagir e participar em um lugar online, e que também têm valor em dinheiro Real."
               ></BalanceDisplay>
               <BalanceDisplay
-                label="Hive Power"
+                label="Poder trevoso"
+                labelStyle={{ color: '#b4d701' }}
                 balance={hivePower}
-                labelTooltip="Hive Power signifies influence, voting, and status within Hive blockchain. 🚀🤝"
-                balanceTooltip="Hive Power represents a user's influence and engagement within the Hive blockchain. It's like your reputation and impact score on the platform. When you ´power up Hive tokens by converting liquid Hive into Hive Power, you increase your ability to vote on content and participate in network governance. This boosts your say in decision-making and supports the Hive ecosystem's stability and decentralization. It's like investing in your standing and community involvement on Hive. 🚀🤝s"
+                labelTooltip="Poder Trevoso significa influência, votação e status dentro da Crowsnight."
+                balanceTooltip="Poder Trevoso é como uma pontuação que mostra o quanto alguém é importante na Crowsnight, uma espécie de rede social. É uma mistura de influência e participação.
+                Imagine que cada pessoa tem um tipo de pontuação de respeito na comunidade. Quanto mais Poder Trevoso você tem, mais respeitado e ouvido você é."
               />
   
             </HStack>
             <HStack spacing={4} align="stretch">
               <BalanceDisplay
-                label="Dollar Savings"
+                label="Bolsa de sangue trevosa"
+                labelStyle={{ color: '#b4d701' }}
                 balance={savingsBalance}
-                labelTooltip="Hive Savings are like a savings account for your HBD tokens. 🚀🤝"
-                balanceTooltip="Picture it like planting some Hive coins, but in this case, they're Hive Backed Dollars (HBD), kind of like specialized cannabis strains. You nurture them over time, and they steadily grow. With a 20% increase each year, it's like cultivating a thriving HBD garden. You're investing your time and care, and eventually, you'll have a bountiful harvest of HBD, just like some potent homegrown herb. So, you're tending to your HBD crop, man, and it's growing just as nicely as your favorite buds. 🌱💵🚀"
+                labelTooltip="A bolsa de sangue trevosa funciona como uma poupança."
+                balanceTooltip="Aqui você pode invenstir suas gotas de sangue trevosa na bolsa para render 20% ao ano."
               />
               <BalanceDisplay
-                label="Hive Dollar"
+                label="Gotas de sangue trevosa"
+                labelStyle={{ color: '#b4d701' }}
                 balance={hbdBalance}
-                labelTooltip="Hive Backed Dollar (HBD) is a stablecoin pegged to the US Dollar"
-                balanceTooltip="Hive Backed Dollars (HBD) are a stablecoin on the Hive blockchain designed to maintain a value close to one United States dollar. They are backed by Hive cryptocurrency held in a collateralized debt position. HBD provides users with a stable and reliable digital currency for transactions, making it a practical choice for everyday use within the Hive ecosystem."
+                labelTooltip=" A gota de sangue trevosa utiliza um mecanismo de garantia para manter seu valor próximo ao dólar americano."
+                balanceTooltip="Quando alguém deseja adquirir gota de sangue trevosa, ela pode depositar uma quantia específica de gota de sangue como garantia. Esse depósito é mantido em uma reserva e, em troca, a pessoa recebe a quantidade equivalente de gota de sangue trevosa. Se o valor da gota de sangue trevosa começar a se desviar do valor do dólar, o sistema ajusta automaticamente a quantidade de gota de sangue necessária como garantia para estabilizar o valor do gota de sangue trevosa."
                 labelLink='https://giveth.io/es/project/skatehive-skateboarding-community'
   
               />
             </HStack>
             <Divider backgroundColor="red" />
             <BalanceDisplay
-              label="Delegated to You"
+              label="delegado para você"
               balance={HPdelegatedToUser}
-              labelTooltip="How much HivePower People is delegating to You 🚀🤝"
+              labelTooltip="quanto poder trevoso as pessoas estão delegando para você"
               
               ></BalanceDisplay>
             
@@ -387,7 +392,7 @@ export default function HiveBalanceDisplay2() {
               <HStack
                 margin="10px"
                 borderRadius="10px"
-                border="1px dashed orange"
+                border="1px solid #5e317a"
                 justifyContent="center"
                 padding="10px"
               >
@@ -411,7 +416,7 @@ export default function HiveBalanceDisplay2() {
               <HStack
                 margin="10px"
                 borderRadius="10px"
-                border="1px dashed orange"
+                border="1px solid #5e317a"
                 justifyContent="center"
                 padding="10px"
               >
@@ -427,28 +432,31 @@ export default function HiveBalanceDisplay2() {
             <Button
               margin="10px"
               borderRadius="10px"
-              border="1px dashed yellow"
+              background={"purple"}
+              color={"b4d701"}
               justifyContent="center"
               padding="10px" onClick={handleOpenModal}>
-              SEND HIVE
+              enviar gota de sangue
             </Button>
             <Button
               margin="10px"
               borderRadius="10px"
-              border="1px dashed yellow"
+              background={"purple"}
+              color={"b4d701"}
               justifyContent="center"
               padding="10px" onClick={handleOpenSendHBDModal}>
-              SEND HBD
+              enviar gota de sangue trevosa
             </Button>
             <Button
               margin="10px"
               borderRadius="10px"
-              border="1px dashed yellow"
+              background={"purple"}
+              color={"b4d701"}
               justifyContent="center"
               padding="10px"
               onClick={handleOpenDelegationModal}
             >
-             👑 Delegate Hive Power to SkateHive 👑
+             emprestar poder trevoso para crowsnight
             </Button>
           </>
         )}
@@ -505,7 +513,7 @@ balanceStyle?: React.CSSProperties;
 return (
 <Box
   borderRadius="5px"
-  border="1px solid red"
+  border="1px solid #5e317a"
   width="100%"
   padding="10px"
   textAlign="center"
@@ -513,22 +521,22 @@ return (
   {labelTooltip ? (
     <Tooltip label={labelTooltip} bg="black" color="white" borderRadius="10px" border="1px dashed limegreen">
       {labelLink ? (
-        <ChakraLink color="white" fontWeight="bold"  href={labelLink} isExternal style={labelStyle}>
+        <ChakraLink color="white"  href={labelLink} isExternal style={labelStyle}>
           {label}
         </ChakraLink>
       ) : (
-        <Text color="white" fontWeight="bold" cursor="pointer" style={labelStyle}>
+        <Text color="white" cursor="pointer" style={labelStyle}>
           {label}
         </Text>
       )}
     </Tooltip>
   ) : (
     labelLink ? (
-      <ChakraLink color="white" fontWeight="bold"  href={labelLink} isExternal style={labelStyle}>
+      <ChakraLink color="white"  href={labelLink} isExternal style={labelStyle}>
         {label}
       </ChakraLink>
     ) : (
-      <Text color="white" fontWeight="bold" style={labelStyle}>
+      <Text color="white" style={labelStyle}>
         {label}
       </Text>
     )
