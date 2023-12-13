@@ -279,9 +279,9 @@ bg=""
     >
 
       <Flex width="100%" justifyContent="space-between" alignItems="center" mb={{ base: 2, md: 0 }}>
-      <Menu>
-  <MenuButton
-    as={Button}
+      
+  <Link to="/secret">
+  <Button
     backgroundColor="black"
     border="white 1px solid"
     color="white"
@@ -293,29 +293,17 @@ bg=""
       },
     }}
   >
+    
     <Image
       src="/assets/crn4.jpg"
       alt="Dropdown Image"
       boxSize="50px" // Adjust the size as needed
       borderRadius="10px"
     />
-  </MenuButton>
-  <MenuList border="1px solid white" backgroundColor="black" color="white">
+    
+  </Button>
+  </Link>
   
-    <Link to="/secret" style={{ textDecoration: 'none' }}>
-      <MenuItem
-        _hover={{ backgroundColor: 'white', color: 'black' }} // Invert colors on hover
-        backgroundColor="black"
-      >
-        ㊙ Secret Spot
-      </MenuItem>
-    </Link>
-    
-    <MenuDivider />
-
-    
-  </MenuList>
-</Menu>
 
       <Text 
         fontSize={fontSize} 
