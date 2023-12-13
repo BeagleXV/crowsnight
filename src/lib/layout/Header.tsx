@@ -300,32 +300,8 @@ bg=""
       borderRadius="10px"
     />
   </MenuButton>
-  <MenuList border="1px solid white" backgroundColor="#593576" color="white">
-    <Link to="https://snapshot.org/#/skatehive.eth" style={{ textDecoration: 'none' }}>
-      <MenuItem
-        _hover={{ backgroundColor: '#65418C', color: 'white' }}
-              backgroundColor="#593576"  // Invert colors on hover
-              >
-        🏛 Governance
-      </MenuItem>
-    </Link>
-    <Link to="https://hive.vote/dash.php?i=1&trail=steemskate" target="_blank" style={{ textDecoration: 'none' }}>
-      <MenuItem
-        _hover={{ backgroundColor: '#65418C', color: 'white' }}
-              backgroundColor="#593576" // Invert colors on hover
-              >
-        🔗 Curation Trail
-      </MenuItem>
-    </Link>
-    <Link to="https://docs.skatehive.app" target="_blank" style={{ textDecoration: 'none' }}>
-      <MenuItem
-        _hover={{ backgroundColor: '#65418C', color: 'white' }}
-              backgroundColor="#593576"  // Invert colors on hover
-        
-      >
-        📖 Docs
-      </MenuItem>
-    </Link>
+  <MenuList border="1px solid white" backgroundColor="black" color="white">
+  
     <Link to="/secret" style={{ textDecoration: 'none' }}>
       <MenuItem
         _hover={{ backgroundColor: 'white', color: 'black' }} // Invert colors on hover
@@ -334,15 +310,7 @@ bg=""
         ㊙ Secret Spot
       </MenuItem>
     </Link>
-    <Link to="https:/github.com/sktbrd/skateapp" target="_blank" style={{ textDecoration: 'none' }}>
-      <MenuItem
-        _hover={{ backgroundColor: '#65418C', color: 'white' }}
-              backgroundColor="#593576"  // Invert colors on hover
-        
-      >
-        💻 Contribute
-      </MenuItem>
-    </Link>
+    
     <MenuDivider />
 
     
@@ -388,7 +356,7 @@ bg=""
         }}
       >
         <TabList display="flex" alignItems="center">
-          <LinkTab to="/" color="#b4d701" _selected={{ backgroundColor: "#0D0D0D", border:"3px #5E317A solid" }}>Página principal</LinkTab>
+          <LinkTab to="/" color="#b4d701" _selected={{ backgroundColor: "#0D0D0D", border:"3px #5E317A solid" }}>Home</LinkTab>
           <LinkTab to="/QFS" color="#b4d701" _selected={{ backgroundColor: "#0D0D0D", border:"3px #5E317A solid" }} >Game</LinkTab>
 
           {loggedIn && <LinkTab to="/wallet" color="#b4d701" _selected={{ backgroundColor: "#0D0D0D", border:"3px #5E317A solid" }}>Carteira</LinkTab>} {/* Conditionally render Wallet tab */}
