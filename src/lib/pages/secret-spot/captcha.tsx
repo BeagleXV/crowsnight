@@ -198,7 +198,7 @@ const Captcha: React.FC<CaptchaProps> = ({ onCaptchaCompletion }) => {
   return (
     <Box>
         <center>
-        <img src="public/assets/skeleton.gif" ></img>
+        <img src="/assets/skeleton.gif" ></img>
         </center>
       
         <h1 style={{ color: '#b4d701' }}> Tormento quer aprender a mandar um {randomTrickName}, ele é goofy</h1>
