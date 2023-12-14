@@ -75,6 +75,9 @@ dependencies:
   get-blob-duration:
     specifier: ^1.2.0
     version: 1.2.0
+  is-touch-device:
+    specifier: ^1.0.1
+    version: 1.0.1
   keychain-sdk:
     specifier: ^0.4.0
     version: 0.4.0
@@ -164,6 +167,9 @@ devDependencies:
   '@types/express':
     specifier: ^4.17.17
     version: 4.17.21
+  '@types/is-touch-device':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@types/node':
     specifier: ^20.5.8
     version: 20.9.3
@@ -6585,6 +6591,10 @@ packages:
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
     dev: true
 
+  /@types/is-touch-device@1.0.2:
+    resolution: {integrity: sha512-3g/auyKK+wQ7oTKv/ew1Nl3WFpU4qi21bM6664qAKWSZ2jfU2xaV29e8yv9t8ON0pnKwAG1Y0bqY/nFBgqbZSw==}
+    dev: true
+
   /@types/json-schema@7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: false
@@ -12365,6 +12375,10 @@ packages:
     dependencies:
       text-extensions: 1.9.0
     dev: true
+
+  /is-touch-device@1.0.1:
+    resolution: {integrity: sha512-LAYzo9kMT1b2p19L/1ATGt2XcSilnzNlyvq6c0pbPRVisLbAPpLqr53tIJS00kvrTkj0HtR8U7+u8X0yR8lPSw==}
+    dev: false
 
   /is-typed-array@1.1.10:
     resolution: {integrity: sha512-PJqgEHiWZvMpaFZ3uTc8kHPM4+4ADTlDniuQL7cU/UDA0Ql7F70yGfHph3cLNe+c9toaigv+DFzTJKhc2CtO6A==}

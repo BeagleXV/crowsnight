@@ -3,6 +3,7 @@ import { Box, Grid, Image, Button } from '@chakra-ui/react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
+import  isTouchDevice  from 'is-touch-device';
 import { color } from 'framer-motion';
 
 // Define the ImageItem interface
@@ -382,9 +383,9 @@ const Result: React.FC<ResultProps> = ({ userImagePositions, isAnswerCorrect, ra
 
 // Define the CaptchaPage component
 const CaptchaPage: React.FC<{ onCaptchaCompletion: (completed: boolean) => void }> = ({ onCaptchaCompletion }) => {
+  const backend = isTouchDevice() ? TouchBackend : HTML5Backend;
   return (
-    <DndProvider backend={HTML5Backend}>
-      <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}></DndProvider>
+    <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
       <Captcha onCaptchaCompletion={onCaptchaCompletion} />
     </DndProvider>
   );
