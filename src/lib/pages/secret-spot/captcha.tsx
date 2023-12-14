@@ -198,12 +198,12 @@ const Captcha: React.FC<CaptchaProps> = ({ onCaptchaCompletion }) => {
   return (
     <Box>
         <center>
-        <img src="https://i.ibb.co/6ZqHYdK/image.png" ></img>
+        <img src="public/assets/skeleton.gif" ></img>
         </center>
       
-        <h1 style={{ color: 'white' }}> Pepe wants to learn {randomTrickName}, he is goofy</h1>
-        <h1 style={{ color: 'white' }}> proove that you're cool helping Pepe to land it by</h1>
-        <h1 style={{ color: 'white' }}> placing his foot in the right position for {randomTrickName}</h1>
+        <h1 style={{ color: '#b4d701' }}> Tormento quer aprender a mandar um {randomTrickName}, ele é goofy</h1>
+        <h1 style={{ color: '#b4d701' }}> prove que você é trevoso e passe a base para o tormento</h1>
+        <h1 style={{ color: '#b4d701' }}> coloque o pé dele na posição certa do {randomTrickName}</h1>
       <Grid
         templateColumns="repeat(6, 1fr)"
         gap={2}
@@ -220,10 +220,10 @@ const Captcha: React.FC<CaptchaProps> = ({ onCaptchaCompletion }) => {
       <center>
 
       {occupiedPositions >= 2 && (
-        <Button onClick={resetCaptcha}>Reset</Button>
+        <Button bg={"purple"} color={"#b4d701"} onClick={resetCaptcha}>tentar de novo</Button>
       )}
       {captchaPassed === null && (
-        <Button onClick={checkAnswers}>Check Answer</Button>
+        <Button bg={"purple"} color={"#b4d701"} onClick={checkAnswers}>mandar manobra</Button>
 
       )}
               </center>
