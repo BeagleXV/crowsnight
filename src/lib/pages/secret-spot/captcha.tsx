@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Image, Button } from '@chakra-ui/react';
+import { Box, Grid, Image, Button,Flex } from '@chakra-ui/react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -203,9 +203,9 @@ const Captcha: React.FC<CaptchaProps> = ({ onCaptchaCompletion }) => {
         <img src="/assets/skeleton.gif" ></img>
         </center>
       
-        <h1 style={{ color: '#b4d701' }}> Tormento quer aprender a mandar um {randomTrickName}, ele é goofy</h1>
-        <h1 style={{ color: '#b4d701' }}> prove que você é trevoso e passe a base para o tormento</h1>
-        <h1 style={{ color: '#b4d701' }}> coloque o pé dele na posição certa do {randomTrickName}</h1>
+        <h1 style={{ color: '#b4d701', fontSize: '130%'}}> Tormento quer aprender a mandar um {randomTrickName}, ele é goofy</h1>
+        <h1 style={{ color: '#b4d701', fontSize: '130%' }}> prove que você é trevoso e passe a base para o tormento</h1>
+        <h1 style={{ color: '#b4d701', fontSize: '130%' }}> coloque o pé dele na posição certa do {randomTrickName}</h1>
       <Grid
         templateColumns="repeat(6, 1fr)"
         gap={2}
@@ -219,8 +219,8 @@ const Captcha: React.FC<CaptchaProps> = ({ onCaptchaCompletion }) => {
           <DraggableImage  key={image.id} {...image} />
         ))}
       </div>
+      <Flex flexWrap="wrap" justify="center">
       <center>
-
       {occupiedPositions >= 2 && (
         <Button bg={"purple"} color={"#b4d701"} onClick={resetCaptcha}>tentar de novo</Button>
       )}
@@ -229,7 +229,7 @@ const Captcha: React.FC<CaptchaProps> = ({ onCaptchaCompletion }) => {
 
       )}
               </center>
-
+              </Flex>
       {captchaPassed !== null && captchaPassed === true && (
         // Render the form only if the captcha is passed
         <div>

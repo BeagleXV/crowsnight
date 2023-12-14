@@ -71,6 +71,7 @@ const VhsTape: React.FC<VhsTapeProps> = ({
 const Shelf = () => {
   const [selectedTapeId, setSelectedTapeId] = useState<number | null>(1); // Initial selected id
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+  const zoomFactor = 0.9;
 
 
 
@@ -88,7 +89,7 @@ const Shelf = () => {
   };
 
   return (
-    <Flex align="center" justify="center" mt={4}>
+    <Flex align="center" justify="center" mt={4} style={{ transform: `scale(${zoomFactor})` }} >
       <Flex flexDirection="column" alignItems="center" width={['95%', '80%', '70%', '60%']}>
         <Text fontSize="xl" mb={4}>
           VHS Tapes Shelf
