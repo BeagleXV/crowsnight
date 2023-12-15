@@ -231,6 +231,9 @@ export default function HiveBalanceDisplay2() {
     event.preventDefault(); // Prevent the default button click behavior
     setShowModal(true);
   };
+
+
+  
   
   const handleLogoClick = (balanceType: string) => {
     console.log(`Clicked ${balanceType} logo`);
@@ -429,6 +432,17 @@ export default function HiveBalanceDisplay2() {
                 <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px">Sell Hive  </ChakraLink>
               </HStack>
             </Tooltip>
+            <Button
+              margin="10px"
+              borderRadius="10px"
+              background={"purple"}
+              color={"b4d701"}
+              justifyContent="center"
+              padding="10px"
+        
+              >
+              sacar no pix
+            </Button>
             <Button
               margin="10px"
               borderRadius="10px"
