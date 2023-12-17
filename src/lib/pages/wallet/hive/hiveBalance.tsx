@@ -11,6 +11,7 @@ import PowerUpModal from "./powerUpModal";
 import PowerDownModal from "./powerDownModal";
 import DelegationModal from "./delegationModal";
 import { useFetcher } from "react-router-dom";
+import BuyModal from "./BuyModal3";
 
 
 const dhiveClient = new dhive.Client([
@@ -119,6 +120,8 @@ export default function HiveBalanceDisplay2() {
   const [profileImage, setProfileImage] = useState<string>("https://i.gifer.com/origin/f1/f1a737e4cfba336f974af05abab62c8f_w200.gif");
   const [delegatedToUserInUSD, setDelegatedToUserInUSD] = useState<string>("0");
   const [HPdelegatedToUser, setHPdelegatedToUser] = useState<string>("0");
+  const [buyModalShow, setBuyModalShow] = useState(false);
+
 
   const convertVestingSharesToHivePower = async (
     vestingShares: string,
@@ -439,7 +442,7 @@ export default function HiveBalanceDisplay2() {
               color={"b4d701"}
               justifyContent="center"
               padding="10px"
-        
+              onClick={() => setBuyModalShow(true)}
               >
               sacar no pix
             </Button>
@@ -495,6 +498,7 @@ export default function HiveBalanceDisplay2() {
         hiveMemo={hiveMemo} // Make sure to pass hiveMemo here
         setHiveMemo={setHiveMemo}
       />
+      
   
       {/* <WalletTransactions wallet={user?.name || ""} /> */}
       <PowerUpModal isOpen={showPowerUpModal} onClose={() => setShowPowerUpModal(false)} user={user} />
