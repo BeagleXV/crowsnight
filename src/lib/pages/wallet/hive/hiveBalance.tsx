@@ -478,6 +478,14 @@ export default function HiveBalanceDisplay2() {
           </>
         )}
       </VStack>
+  
+  <BuyModal
+    showModal={buyModalShow}
+    setShowModal={setBuyModalShow}
+    hiveMemo={hiveMemo} // Make sure to pass hiveMemo here
+    setHiveMemo={setHiveMemo}
+    />
+
       <SendHiveModal
         showModal={showModal}
         setShowModal={setShowModal}
