@@ -86,8 +86,9 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
       }
 
       // Fetch the current value of Hive in BRL from an API
-      const response = await axios.get('https://api.hive.blog');
-      const hiveValueInBRL = response.data.value; // Replace with the actual property from the API response
+      const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=hive&vs_currencies=brl');
+      console.log(response.data.hive.brl)
+      const hiveValueInBRL = response.data.hive.brl; // Replace with the actual property from the API response
 
       // Convert the input Hive value to BRL
       const convertedValue = parseFloat(amount) * hiveValueInBRL;

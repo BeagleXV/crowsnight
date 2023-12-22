@@ -209,9 +209,9 @@ export default function HiveBalanceDisplay2() {
         const total = hiveWorth + hivePowerWorth + hbdWorth + savingsWorth + delegatedToUserInUSD; 
         const total_Owned = Number(hiveWorth) + Number(savingsWorth) + Number(hbdWorth) + Number(hivePowerWorth) ;
         setConversionRate(conversionRate);
-        setHbdBalance(user.hbd_balance);
-        setHiveBalance(user.balance);
-        setSavingsBalance(user.savings_hbd_balance);
+        setHbdBalance((user.hbd_balance.split(" ")[0]));
+        setHiveBalance((user.balance.split(" ")[0]));
+        setSavingsBalance((user.savings_hbd_balance.split(" ")[0]));
         setHivePower(`${vestingSharesData.DelegatedToSomeoneHivePower} (delegated to others)  + ${vestingSharesData.hivePower} (not delegated)`);
         setTotalWorth(total);
         setIsLoading(false);
@@ -388,53 +388,6 @@ export default function HiveBalanceDisplay2() {
               
               ></BalanceDisplay>
             
-            <Tooltip
-              bg="black"
-              color="white"
-              borderRadius="10px"
-              border="1px dashed limegreen"
-              label="Buy hive using other crypto"
-            >
-              <HStack
-                margin="10px"
-                borderRadius="10px"
-                border="1px solid #5e317a"
-                justifyContent="center"
-                padding="10px"
-              >
-                <Image
-                  src="https://images.ecency.com/u/hive-173115/avatar/large"
-                  alt="Avatar"
-                  width="20px"
-                  height="20px"
-                />
-                <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px">Buy HIVE </ChakraLink>
-              </HStack>
-            </Tooltip>
-  
-            <Tooltip
-              bg="black"
-              color="white"
-              borderRadius="10px"
-              border="1px dashed limegreen"
-              label="Dont! power up!"
-            >
-              <HStack
-                margin="10px"
-                borderRadius="10px"
-                border="1px solid #5e317a"
-                justifyContent="center"
-                padding="10px"
-              >
-                <Image
-                  src="https://images.ecency.com/u/hive-173115/avatar/large"
-                  alt="Avatar"
-                  width="20px"
-                  height="20px"
-                />
-                <ChakraLink target="_blank" href="https://simpleswap.io/" fontSize="16px">Sell Hive  </ChakraLink>
-              </HStack>
-            </Tooltip>
             <Button
               margin="10px"
               borderRadius="10px"
