@@ -36,7 +36,6 @@ interface ErrorModalProps {
 }
 
 const nodes = [
-  "https://rpc.ecency.com",
   "https://api.deathwing.me",
   "https://api.hive.blog",
   "https://api.openhive.network",

@@ -29,7 +29,6 @@ import { compileFunction } from "vm";
 import * as Types from './types';
 
 const nodes = [
-  "https://rpc.ecency.com",
   "https://api.deathwing.me",
   "https://api.hive.blog",
   "https://api.openhive.network",

@@ -33,6 +33,7 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
   const [nome, setNome] = useState("");
   const [amount, setAmount] = useState("");
   const [chavepix, setChavepix] = useState("");
+  const [hiveToBRL, setHiveToBRL] = useState<number | null>(null);
   const keychain = new KeychainSDK(window);
   const secretKey = 'tormento666';
 
@@ -75,6 +76,27 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
     } catch (error) {
       console.error("Transfer error:", error);
     }
+
+  };
+  const handleConvertToBRL = async () => {
+    try {
+      if (!amount) {
+        alert("Por favor, insira um valor em Hive para converter.");
+        return;
+      }
+
+      // Fetch the current value of Hive in BRL from an API
+      const response = await axios.get('https://api.hive.blog');
+      const hiveValueInBRL = response.data.value; // Replace with the actual property from the API response
+
+      // Convert the input Hive value to BRL
+      const convertedValue = parseFloat(amount) * hiveValueInBRL;
+      setHiveToBRL(convertedValue);
+
+      // Optionally, you can update the UI or perform other actions with the converted value
+    } catch (error) {
+      console.error("Error fetching Hive to BRL conversion:", error);
+    }
   };
 
   return (
@@ -112,8 +134,20 @@ const BuyModal: React.FC<SendHiveModalProps> = ({
           <Button colorScheme="purple" color={"#b4d701"} onClick={() => setShowModal(false)}>
             Fechar
           </Button>
+          <Button colorScheme="purple" color={"#b4d701"} onClick={handleConvertToBRL}>
+          Converter para Real
+        </Button>
         </ModalFooter>
-      </ModalContent>
+        {hiveToBRL !== null && (
+        <Box border="3px solid #5e317a" padding="10px" marginTop="10px">
+          <Input
+            value={`R$ ${hiveToBRL.toFixed(2)}`} // Display the converted value in the input
+            isReadOnly
+            color={'white'}
+          />
+        </Box>
+      )}
+    </ModalContent>
     </Modal>
   );
 };

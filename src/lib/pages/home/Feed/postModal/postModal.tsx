@@ -31,7 +31,6 @@ import * as Types from '../types';
 import { MarkdownRenderers } from '../../../utils/MarkdownRenderers';
 import HiveLogin from '../../api/HiveLoginModal';
 const nodes = [
-  "https://rpc.ecency.com",
   "https://api.deathwing.me",
   "https://api.hive.blog",
   "https://api.openhive.network",
