@@ -10,6 +10,7 @@ import WalletTransactions from "./dao/components/hiveGnars/txHistory";
     return (
       <Flex direction="column" alignItems="center" justifyContent="center">
 <WalletTransactions wallet="crowsnight"/>
+<WalletTransactions wallet="beaglexv"/>
         <Chat />
       </Flex>
     );
