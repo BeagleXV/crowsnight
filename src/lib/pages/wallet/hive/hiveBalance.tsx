@@ -1,4 +1,4 @@
-import { Image, Box, Table, Thead, Tbody, Tr, Th, Td, Text, Flex, Button, VStack, HStack, Divider, Tooltip } from "@chakra-ui/react";
+import { Image, Box, Table, Thead, Tbody, Tr, Th, Td, Text, Flex, Button, VStack, HStack, Divider, Tooltip, Badge } from "@chakra-ui/react";
 import { Link as ChakraLink } from "@chakra-ui/react";
 
 import { useState, useEffect } from "react";
@@ -259,7 +259,11 @@ export default function HiveBalanceDisplay2() {
       border="2px solid #5e317a"
       padding="10px"
       maxWidth={{ base: "100%", md: "100%" }}
+      style={{ textAlign: "right" }}
     >
+      <Text fontSize={"18px"} color="#b4d701">
+        Valor da gota de sangue: <Badge variant='outline' fontSize={"24px"} colorScheme="red"> R${conversionRate.toFixed(2)}</Badge>
+      </Text>
       <VStack spacing={4} align="stretch">
         <Flex alignItems="center" justifyContent="center" padding="10px">
           <Box
