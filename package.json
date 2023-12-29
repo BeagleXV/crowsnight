@@ -27,6 +27,7 @@
     "@emotion/styled": "^11.11.0",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
+    "@fontsource-variable/grenze-gotisch": "^5.0.18",
     "@fontsource/creepster": "^5.0.8",
     "@fontsource/open-sans": "^5.0.14",
     "@fontsource/plus-jakarta-sans": "^5.0.18",

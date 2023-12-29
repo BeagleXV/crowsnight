@@ -23,6 +23,9 @@ dependencies:
   '@esbuild-plugins/node-modules-polyfill':
     specifier: ^0.2.2
     version: 0.2.2(esbuild@0.19.7)
+  '@fontsource-variable/grenze-gotisch':
+    specifier: ^5.0.18
+    version: 5.0.18
   '@fontsource/creepster':
     specifier: ^5.0.8
     version: 5.0.8
@@ -3279,6 +3282,10 @@ packages:
       long: 4.0.0
       randombytes: 2.1.0
       text-encoding: 0.7.0
+    dev: false
+
+  /@fontsource-variable/grenze-gotisch@5.0.18:
+    resolution: {integrity: sha512-VDmPQg+oB+H71ZJX8PMLRg2XI86VKEbaYjK+rLp8lW8Alskf+6VXZ2hnr1W8eQIZ55UjCHYFwIDQD2XqOb76pw==}
     dev: false
 
   /@fontsource/creepster@5.0.8:

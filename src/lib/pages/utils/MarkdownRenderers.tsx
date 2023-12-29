@@ -1,4 +1,5 @@
 import React from 'react';
+import '@fontsource-variable/grenze-gotisch';
 
 type MarkdownProps = {
     node?: any;
@@ -12,6 +13,11 @@ type MarkdownProps = {
     ordered?: any;
   };
   
+  const GrenzeGotischFontContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <div style={{ fontFamily: 'Grenze Gotisch, sans-serif' }}>
+      {children}
+    </div>
+  );
   
 export const MarkdownRenderers = {
     img: ({ alt, src, title, ...props }: RendererProps) => (
@@ -36,8 +42,8 @@ export const MarkdownRenderers = {
       ),
       
 a: ({ children, ...props }: RendererProps) => <a {...props} style={{ color: '#b4d701' }}> {children}</a>,
-p: ({ children, ...props }: RendererProps) => <p {...props} style={{ color: 'white', fontSize: '18px', paddingBottom: '15px' }}>{children}</p>,
-h1: ({ children, ...props }: RendererProps) => <h1 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '26px', paddingBottom: '10px' , paddingTop:"10px" }}>{children}</h1>,
+p: ({ children, ...props }: RendererProps) => <GrenzeGotischFontContainer><p {...props} style={{ color: 'white', fontSize: '18px', paddingBottom: '15px' }}>{children}</p></GrenzeGotischFontContainer>,
+h1: ({ children, ...props }: RendererProps) => <GrenzeGotischFontContainer><h1 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '26px', paddingBottom: '10px' , paddingTop:"10px" }}>{children}</h1></GrenzeGotischFontContainer>,
 h2: ({ children, ...props }: RendererProps) => <h2 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '20px', paddingBottom: '8px' , paddingTop:"10px"}}>{children}</h2>,
 h3: ({ children, ...props }: RendererProps) => <h3 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '18px', paddingBottom: '6px' , paddingTop:"10px"}}>{children}</h3>,
 h4: ({ children, ...props }: RendererProps) => <h4 {...props} style={{ fontWeight: 'bold', color: '#b4d701', fontSize: '16px', paddingBottom: '4px' , paddingTop:"10px"}}>{children}</h4>,
@@ -76,6 +82,7 @@ sub: ({ children, ...props }: RendererProps) => (<sub {...props} style={{color: 
 hr: ({ children, ...props }: RendererProps) => <hr {...props} style={{ paddingBottom: '20px' }}>{children}</hr>,
 br: ({ children, ...props }: RendererProps) => <br {...props} style={{ paddingBottom: '20px' }}>{children}</br>,
 pre: ({ children, ...props }: RendererProps) => (
+  <GrenzeGotischFontContainer>
   <div
     style={{
       backgroundColor: '#1E1E1E', // Dark gray background
@@ -97,6 +104,7 @@ pre: ({ children, ...props }: RendererProps) => (
       {children}
     </code>
   </div>
+  </GrenzeGotischFontContainer>
 ),
 
 
