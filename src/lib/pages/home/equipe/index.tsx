@@ -11,8 +11,7 @@ interface Card {
 
 const cardData: Card[] = [
   {
-    imageUrl: '../../../../assets/team/baba.png',
-    hoverImageUrl: '../../../../assets/team/baba666g.gif', // Specify hover image URL
+    imageUrl: '../../../../assets/team/baba.png', // Specify hover image URL
     subtitle: 'Baba de Lex',
     url: 'https://crowsnight.vercel.app/profile/babaskt'
     },

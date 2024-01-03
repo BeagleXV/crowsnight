@@ -793,6 +793,7 @@ const username = user?.name;
                       onChange={handleMarkdownChange}
                       placeholder="Escreva seu texto..."
                       minHeight="600px"
+                      fontFamily='Grenze Gotisch Variable, sans-serif'
                       marginTop={4}
                       borderColor="#5E317A"
                       color={'white'}
