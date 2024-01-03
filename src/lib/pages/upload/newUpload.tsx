@@ -313,7 +313,7 @@ const NewUpload: React.FC = () => {
 
   const renderThumbnailOptions = () => {
     const selectedThumbnailStyle = {
-      border: '2px solid limegreen',
+      border: '2px solid',
     };
 
     const imageUrls = extractImageUrls(markdownText);
