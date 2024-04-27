@@ -2,6 +2,7 @@ import { extendTheme } from "@chakra-ui/react";
 import '@fontsource/creepster';
 import '@fontsource-variable/grenze-gotisch';
 
+
 type GlobalStyleProps = { colorMode: "light" | "dark" };
 
 const themeConfig = {

@@ -21,11 +21,7 @@ const cardData: Card[] = [
     subtitle: 'Zero',
     },
 
-  {
-    imageUrl: '../../../../assets/team/bodao.png',
-    hoverImageUrl: '../../../../assets/team/bodaog.gif',
-    subtitle: 'Matheus Bodão',
-  },
+
   {
     imageUrl: '../../../../assets/team/emo.png',
     hoverImageUrl: '',
@@ -54,13 +50,7 @@ const cardData: Card[] = [
     subtitle: 'Bruno Boaz',
     hoverImageUrl: '../../../../assets/team/brunetg.gif',
     url: ''
-  },
-  { 
-    imageUrl: '../../../../assets/team/meola.jpeg',
-    subtitle: 'Meola',
-    hoverImageUrl: '../../../../assets/team/meolag.gif',
-    url: ''
-  },
+  }
 
 ];
 
